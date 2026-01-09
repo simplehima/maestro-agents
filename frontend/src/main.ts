@@ -1,7 +1,8 @@
 import './style.css';
 
-const API_URL = 'http://localhost:8000';
-const WS_URL = 'ws://localhost:8000/ws';
+const isProd = window.location.port !== '5173';
+const API_URL = isProd ? `${window.location.protocol}//${window.location.host}` : 'http://localhost:8000';
+const WS_URL = isProd ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws` : 'ws://localhost:8000/ws';
 
 let socket: WebSocket | null = null;
 let currentProjectId: string | null = null;

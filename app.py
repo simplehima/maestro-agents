@@ -1,14 +1,30 @@
 import json
 import asyncio
 import httpx
+import os
+import sys
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 import uuid
 from pathlib import Path
 
+# Fix for PyInstaller path handling
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        # Running in a bundle
+        return Path(sys._MEIPASS)
+    else:
+        # Running in normal Python environment
+        return Path(__file__).parent
+
+BASE_DIR = get_base_path()
+
+# Import from local modules
+sys.path.append(str(BASE_DIR))
 from config import (
     OLLAMA_API_URL, OLLAMA_CHAT_URL, DEFAULT_MODEL, 
     get_model_for_role, get_available_models, set_model_preset,
@@ -30,6 +46,17 @@ app.add_middleware(
 
 # In-memory storage
 active_projects: Dict[str, dict] = {}
+
+# --- [API Endpoints Placeholder] ---
+# (I'll keep the logic but move static files to the end)
+
+# ... (rest of the code remains same until uvicorn.run)
+
+# [KEEP ALL PREVIOUS FUNCTIONS: call_llm, call_ollama, etc.]
+# (I'm skipping them for the diff block but they are there)
+
+# ... [insert previous functions here] ...
+# (Wait, I need to provide the FULL replacement content or chunks. I'll use chunks.)
 
 class ObjectiveRequest(BaseModel):
     objective: str
@@ -346,6 +373,49 @@ Original Objective: {objective}
         "outputPath": str(output_path)
     })
 
+# --- Static File Serving ---
+# Find frontend/dist relative to BASE_DIR (works for both dev and prod)
+frontend_dist = BASE_DIR / "frontend" / "dist"
+
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
+    
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # Serve index.html for any unknown route to support SPA if needed
+        # but check if it's an API route first
+        if full_path.startswith("api/") or full_path in ["projects", "projects/create", "projects/open", "start", "models/presets", "models/preset"]:
+            return None # Fastapi will handle it
+        
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+else:
+    print(f"Warning: Frontend dist directory not found at {frontend_dist}")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import logging
+    
+    # Setup logging to file for easier debugging of the executable
+    log_file = BASE_DIR / "maestro_v2.log"
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+    
+    logger = logging.getLogger("uvicorn")
+    logger.info(f"Starting Maestro V2 from {BASE_DIR}")
+    logger.info(f"Frontend dist: {frontend_dist}")
+    
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+    except Exception as e:
+        logger.error(f"Fatal error: {str(e)}")
+        # Keep window open on error if running as exe
+        if getattr(sys, 'frozen', False):
+            input("Press Enter to exit...")

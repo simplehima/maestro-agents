@@ -5,7 +5,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, List
 
-PROJECTS_DIR = Path(__file__).parent / "projects"
+# Fix for PyInstaller persistent storage path
+def get_executable_dir():
+    if getattr(sys, 'frozen', False):
+        return Path(sys.executable).parent
+    return Path(__file__).parent
+
+import sys
+PROJECTS_DIR = get_executable_dir() / "projects"
 
 class Project:
     def __init__(self, name: str, path: Path):

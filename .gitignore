@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.build
+.pytest_cache/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+
+# Frontend Build
+dist/
+frontend/dist/
+
+# Maestro Specific
+projects/
+*.log
+maestro_v2.log
+
+# PyInstaller Build
+build/
+*.spec
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
