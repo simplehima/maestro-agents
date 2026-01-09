@@ -4,99 +4,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maestro AI Agents</title>
+  <title>Maestro V2 - AI Agent Platform</title>
   <link rel="stylesheet" href="./src/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Figtree:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="dark-theme">
+<body>
   <div id="app">
-    <header>
-      <div class="logo">
-        <span class="maestro-text">MAESTRO</span>
-        <span class="agents-text">AGENTS</span>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">✦</span>
+          <span class="logo-text">Maestro</span>
+          <span class="version-badge">V2</span>
+        </div>
       </div>
-      <div class="status-badge" id="backend-status">
-        <span class="dot"></span> Backend Offline
-      </div>
-    </header>
 
-    <main>
-      <section class="control-panel">
-        <div class="glass-card">
-          <h2>New Project</h2>
-          <div class="input-group">
-            <textarea id="objective-input"
-              placeholder="What do you want the team to build? e.g. Build a premium task manager app."></textarea>
-            <button id="start-btn">Start Orchestration</button>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-view="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="projects">
+          <i data-lucide="folder-open"></i>
+          <span>Projects</span>
+        </button>
+        <button class="nav-btn" data-view="agents">
+          <i data-lucide="users"></i>
+          <span>Agents</span>
+        </button>
+        <button class="nav-btn" data-view="settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section">
+        <h3 class="section-title">Recent Projects</h3>
+        <div id="recent-projects" class="project-list">
+          <div class="empty-state">No projects yet</div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator" id="backend-status">
+          <span class="dot offline"></span>
+          <span>Disconnected</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard View -->
+      <section id="dashboard-view" class="view active">
+        <header class="view-header">
+          <h1>New Project</h1>
+          <div class="model-selector">
+            <label>Model Preset:</label>
+            <select id="model-preset">
+              <option value="basic">Basic (8B models)</option>
+              <option value="standard">Standard (13B-70B)</option>
+              <option value="advanced">Advanced (33B-70B)</option>
+              <option value="cloud">Cloud (GPT-4, Claude)</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="dashboard-grid">
+          <div class="card objective-card">
+            <div class="card-header">
+              <i data-lucide="target"></i>
+              <h2>Project Objective</h2>
+            </div>
+            <div class="card-body">
+              <input type="text" id="project-name" placeholder="Project Name (optional)">
+              <textarea id="objective-input"
+                placeholder="Describe what you want to build...&#10;&#10;Example: Build a modern task management app with a dark theme, drag-and-drop functionality, and real-time sync."></textarea>
+              <button id="start-btn" class="primary-btn">
+                <i data-lucide="play"></i>
+                Start Orchestration
+              </button>
+            </div>
+          </div>
+
+          <div class="card guidance-card">
+            <div class="card-header">
+              <i data-lucide="message-circle"></i>
+              <h2>Live Guidance</h2>
+            </div>
+            <div class="card-body">
+              <p class="hint">Intervene and steer the agents in real-time</p>
+              <div class="input-row">
+                <input type="text" id="guidance-input" placeholder="Give instructions to agents...">
+                <button id="guide-btn" class="secondary-btn">Send</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="glass-card guidance-card">
-          <h2>Live Guidance</h2>
-          <p class="subtitle">Intervene and guide the agents in real-time.</p>
-          <div class="input-group">
-            <input type="text" id="guidance-input" placeholder="Give instructions to the agents...">
-            <button id="guide-btn">Send Guidance</button>
+        <!-- Agent Grid -->
+        <div class="agent-section">
+          <h2 class="section-title">Agent Team</h2>
+          <div class="agent-grid">
+            <div class="agent-card" id="agent-orchestrator">
+              <div class="agent-avatar orchestrator">
+                <i data-lucide="brain"></i>
+              </div>
+              <div class="agent-info">
+                <h3>Orchestrator</h3>
+                <p class="agent-role">Planning & Strategy</p>
+                <div class="agent-model">llama3:70b</div>
+              </div>
+              <div class="agent-status idle">Idle</div>
+            </div>
+            <div class="agent-card" id="agent-uiux">
+              <div class="agent-avatar uiux">
+                <i data-lucide="palette"></i>
+              </div>
+              <div class="agent-info">
+                <h3>UI/UX Designer</h3>
+                <p class="agent-role">Interface & Experience</p>
+                <div class="agent-model">deepseek-coder:33b</div>
+              </div>
+              <div class="agent-status idle">Idle</div>
+            </div>
+            <div class="agent-card" id="agent-dev">
+              <div class="agent-avatar developer">
+                <i data-lucide="code-2"></i>
+              </div>
+              <div class="agent-info">
+                <h3>Developer</h3>
+                <p class="agent-role">Backend & Logic</p>
+                <div class="agent-model">codellama:34b</div>
+              </div>
+              <div class="agent-status idle">Idle</div>
+            </div>
+            <div class="agent-card" id="agent-qa">
+              <div class="agent-avatar qa">
+                <i data-lucide="shield-check"></i>
+              </div>
+              <div class="agent-info">
+                <h3>QA Tester</h3>
+                <p class="agent-role">Quality Assurance</p>
+                <div class="agent-model">llama3:8b</div>
+              </div>
+              <div class="agent-status idle">Idle</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="activity-section">
+          <div class="section-header">
+            <h2 class="section-title">Activity Feed</h2>
+            <button id="clear-feed" class="icon-btn"><i data-lucide="trash-2"></i></button>
+          </div>
+          <div id="logs-container" class="logs-container">
+            <div class="log-entry system">
+              <span class="log-icon"><i data-lucide="info"></i></span>
+              <span class="log-text">Waiting for objective...</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="dashboard">
-        <div class="agent-grid">
-          <div class="agent-card" id="agent-orchestrator">
-            <div class="agent-icon">🎯</div>
-            <h3>Orchestrator</h3>
-            <p class="role">Planning & Strategy</p>
-            <div class="agent-status">Idle</div>
+      <!-- Projects View -->
+      <section id="projects-view" class="view">
+        <header class="view-header">
+          <h1>Projects</h1>
+          <button id="new-project-btn" class="primary-btn">
+            <i data-lucide="plus"></i> New Project
+          </button>
+        </header>
+        <div id="projects-grid" class="projects-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- Agents View -->
+      <section id="agents-view" class="view">
+        <header class="view-header">
+          <h1>Agent Logs</h1>
+        </header>
+        <div class="agent-logs-container">
+          <div class="agent-log-tabs">
+            <button class="log-tab active" data-agent="orchestrator">Orchestrator</button>
+            <button class="log-tab" data-agent="uiux">UI/UX</button>
+            <button class="log-tab" data-agent="developer">Developer</button>
+            <button class="log-tab" data-agent="qa">QA</button>
           </div>
-          <div class="agent-card" id="agent-uiux">
-            <div class="agent-icon">🎨</div>
-            <h3>UI/UX Designer</h3>
-            <p class="role">Interface & Experience</p>
-            <div class="agent-status">Idle</div>
-          </div>
-          <div class="agent-card" id="agent-dev">
-            <div class="agent-icon">💻</div>
-            <h3>Developer</h3>
-            <p class="role">Backend & Logic</p>
-            <div class="agent-status">Idle</div>
-          </div>
-          <div class="agent-card" id="agent-qa">
-            <div class="agent-icon">🔍</div>
-            <h3>QA Tester</h3>
-            <p class="role">Quality & Verification</p>
-            <div class="agent-status">Idle</div>
+          <div id="agent-log-viewer" class="agent-log-viewer">
+            <pre>Select an agent to view their session logs...</pre>
           </div>
         </div>
+      </section>
 
-        <div class="activity-feed glass-card">
-          <div class="feed-header">
-            <h2>Activity Feed</h2>
-            <button id="clear-feed">Clear</button>
+      <!-- Settings View -->
+      <section id="settings-view" class="view">
+        <header class="view-header">
+          <h1>Settings</h1>
+        </header>
+        <div class="settings-container">
+          <div class="settings-group">
+            <h3>Model Configuration</h3>
+            <div class="setting-item">
+              <label>Default Preset</label>
+              <select id="default-preset">
+                <option value="basic">Basic</option>
+                <option value="standard">Standard</option>
+                <option value="advanced">Advanced</option>
+                <option value="cloud">Cloud APIs</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Ollama URL</label>
+              <input type="text" id="ollama-url" value="http://localhost:11434">
+            </div>
           </div>
-          <div id="logs-container" class="logs-container">
-            <div class="log-entry system">Standing by for objective...</div>
+          <div class="settings-group">
+            <h3>Cloud API Keys</h3>
+            <div class="setting-item">
+              <label>OpenAI API Key</label>
+              <input type="password" id="openai-key" placeholder="sk-...">
+            </div>
+            <div class="setting-item">
+              <label>Anthropic API Key</label>
+              <input type="password" id="anthropic-key" placeholder="sk-ant-...">
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <div id="final-output-modal" class="modal hidden">
-      <div class="modal-content glass-card">
+    <!-- Final Output Modal -->
+    <div id="output-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
         <div class="modal-header">
-          <h2>Final Polished Output</h2>
-          <button id="close-modal">&times;</button>
+          <h2>Final Output</h2>
+          <button id="close-modal" class="icon-btn"><i data-lucide="x"></i></button>
         </div>
-        <div id="final-output-text" class="markdown-body"></div>
+        <div id="output-text" class="modal-body markdown-body"></div>
+        <div class="modal-footer">
+          <button id="copy-output" class="secondary-btn"><i data-lucide="copy"></i> Copy</button>
+          <button id="save-output" class="primary-btn"><i data-lucide="download"></i> Save</button>
+        </div>
       </div>
     </div>
   </div>
-  <script type="module" src="/src/main.ts"></script>
+
+  <script type="module" src="./src/main.ts"></script>
 </body>
 
 </html>

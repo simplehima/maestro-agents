@@ -1,4 +1,8 @@
-ollama
-rich
-python-dotenv
 requests
+rich
+httpx
+fastapi
+uvicorn[standard]
+websockets
+pydantic
+pyinstaller

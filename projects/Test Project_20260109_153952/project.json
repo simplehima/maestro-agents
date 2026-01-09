@@ -1,0 +1,30 @@
+{
+  "name": "Test Project",
+  "created_at": "2026-01-09T15:39:52.672481",
+  "updated_at": "2026-01-09T15:39:55.376665",
+  "objective": "Build a calculator app",
+  "status": "completed",
+  "tasks": [
+    "Error: Client error '404 Not Found' for url 'http://localhost:11434/api/generate'",
+    "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+  ],
+  "current_task_index": 0,
+  "agents": {
+    "orchestrator": {
+      "model": "llama3:70b",
+      "status": "idle"
+    },
+    "ui_ux": {
+      "model": "deepseek-coder:33b",
+      "status": "idle"
+    },
+    "developer": {
+      "model": "codellama:34b",
+      "status": "idle"
+    },
+    "qa": {
+      "model": "llama3:8b",
+      "status": "idle"
+    }
+  }
+}
