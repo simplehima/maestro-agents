@@ -93,7 +93,7 @@ function handleSocketMessage(data: any) {
 }
 
 // === Logging ===
-function addLog(agent: string, text: string, status?: string) {
+function addLog(agent: string, text: string, _status?: string) {
   const entry = document.createElement('div');
   const agentClass = agent.toLowerCase().replace(/[\/\s]/g, '-');
   entry.className = `log-entry ${agentClass}`;
@@ -128,7 +128,7 @@ function getAgentIcon(agent: string): string {
   return icons[agent] || 'message-circle';
 }
 
-function updateAgentStatus(agent: string, text: string, status?: string) {
+function updateAgentStatus(agent: string, text: string, _status?: string) {
   Object.values(agentCards).forEach(card => card?.classList.remove('active'));
 
   const card = agentCards[agent];
@@ -289,7 +289,7 @@ function sendGuidance() {
 }
 
 // === Modal ===
-function showFinalOutput(text: string, outputPath?: string) {
+function showFinalOutput(text: string, _outputPath?: string) {
   const modal = document.getElementById('output-modal');
   const outputText = document.getElementById('output-text');
 
