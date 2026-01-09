@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maestro AI Agents</title>
+  <link rel="stylesheet" href="./src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="dark-theme">
+  <div id="app">
+    <header>
+      <div class="logo">
+        <span class="maestro-text">MAESTRO</span>
+        <span class="agents-text">AGENTS</span>
+      </div>
+      <div class="status-badge" id="backend-status">
+        <span class="dot"></span> Backend Offline
+      </div>
+    </header>
+
+    <main>
+      <section class="control-panel">
+        <div class="glass-card">
+          <h2>New Project</h2>
+          <div class="input-group">
+            <textarea id="objective-input"
+              placeholder="What do you want the team to build? e.g. Build a premium task manager app."></textarea>
+            <button id="start-btn">Start Orchestration</button>
+          </div>
+        </div>
+
+        <div class="glass-card guidance-card">
+          <h2>Live Guidance</h2>
+          <p class="subtitle">Intervene and guide the agents in real-time.</p>
+          <div class="input-group">
+            <input type="text" id="guidance-input" placeholder="Give instructions to the agents...">
+            <button id="guide-btn">Send Guidance</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard">
+        <div class="agent-grid">
+          <div class="agent-card" id="agent-orchestrator">
+            <div class="agent-icon">🎯</div>
+            <h3>Orchestrator</h3>
+            <p class="role">Planning & Strategy</p>
+            <div class="agent-status">Idle</div>
+          </div>
+          <div class="agent-card" id="agent-uiux">
+            <div class="agent-icon">🎨</div>
+            <h3>UI/UX Designer</h3>
+            <p class="role">Interface & Experience</p>
+            <div class="agent-status">Idle</div>
+          </div>
+          <div class="agent-card" id="agent-dev">
+            <div class="agent-icon">💻</div>
+            <h3>Developer</h3>
+            <p class="role">Backend & Logic</p>
+            <div class="agent-status">Idle</div>
+          </div>
+          <div class="agent-card" id="agent-qa">
+            <div class="agent-icon">🔍</div>
+            <h3>QA Tester</h3>
+            <p class="role">Quality & Verification</p>
+            <div class="agent-status">Idle</div>
+          </div>
+        </div>
+
+        <div class="activity-feed glass-card">
+          <div class="feed-header">
+            <h2>Activity Feed</h2>
+            <button id="clear-feed">Clear</button>
+          </div>
+          <div id="logs-container" class="logs-container">
+            <div class="log-entry system">Standing by for objective...</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="final-output-modal" class="modal hidden">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h2>Final Polished Output</h2>
+          <button id="close-modal">&times;</button>
+        </div>
+        <div id="final-output-text" class="markdown-body"></div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
