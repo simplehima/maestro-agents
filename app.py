@@ -3,6 +3,7 @@ import asyncio
 import httpx
 import os
 import sys
+import threading
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20,6 +21,11 @@ def get_base_path():
     else:
         # Running in normal Python environment
         return Path(__file__).parent
+
+def get_executable_dir():
+    if getattr(sys, 'frozen', False):
+        return Path(sys.executable).parent
+    return Path(__file__).parent
 
 BASE_DIR = get_base_path()
 
@@ -202,6 +208,26 @@ async def open_project(path: str):
 async def delete_project(path: str):
     project_manager.delete_project(path)
     return {"success": True}
+
+@app.get("/logs/{agent}")
+async def get_agent_logs(agent: str):
+    if not project_manager.current_project:
+        return {"logs": "No active project. Start or open a project first."}
+    
+    # Initialize MemoryStore with the current project path
+    memory = MemoryStore(project_manager.current_project.path)
+    # Fetch logs for the specified agent
+    # We use a naming mapping for frontend to internal agent names if needed
+    agent_map = {
+        "uiux": "UI/UX Designer",
+        "developer": "Developer",
+        "qa": "QA Tester",
+        "orchestrator": "Orchestrator"
+    }
+    target_agent = agent_map.get(agent.lower(), agent)
+    content = memory.read_other_agent_logs(target_agent, limit=5)
+    
+    return {"logs": content if content else f"No logs found for {target_agent} yet."}
 
 # Model Configuration Endpoints
 @app.get("/models/presets")
@@ -396,9 +422,11 @@ else:
 if __name__ == "__main__":
     import uvicorn
     import logging
+    import webbrowser
+    import socket
     
     # Setup logging to file for easier debugging of the executable
-    log_file = BASE_DIR / "maestro_v2.log"
+    log_file = get_executable_dir() / "maestro_v2.log"
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -412,10 +440,38 @@ if __name__ == "__main__":
     logger.info(f"Starting Maestro V2 from {BASE_DIR}")
     logger.info(f"Frontend dist: {frontend_dist}")
     
+    # Function to find an available port
+    def find_free_port(start_port=8000, max_attempts=10):
+        for port in range(start_port, start_port + max_attempts):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                try:
+                    s.bind(('0.0.0.0', port))
+                    return port
+                except OSError:
+                    continue
+        return None
+
+    target_port = find_free_port(8000)
+    if not target_port:
+        logger.error("Could not find an available port. Please close other applications.")
+        if getattr(sys, 'frozen', False):
+            input("Press Enter to exit...")
+        sys.exit(1)
+    
+    url = f"http://localhost:{target_port}"
+    logger.info(f"Maestro V2 will be available at: {url}")
+    
+    # Open browser after a short delay
+    def open_browser():
+        import time
+        time.sleep(1.5)
+        webbrowser.open(url)
+    
+    threading.Thread(target=open_browser, daemon=True).start()
+    
     try:
-        uvicorn.run(app, host="0.0.0.0", port=8000)
+        uvicorn.run(app, host="0.0.0.0", port=target_port, log_level="info")
     except Exception as e:
         logger.error(f"Fatal error: {str(e)}")
-        # Keep window open on error if running as exe
         if getattr(sys, 'frozen', False):
             input("Press Enter to exit...")

@@ -225,6 +225,25 @@ body {
     box-shadow: 0 0 8px var(--success);
 }
 
+.user-badge {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.user-badge svg {
+    width: 14px;
+    height: 14px;
+    color: var(--accent-primary);
+}
+
 /* ===== MAIN CONTENT ===== */
 .main-content {
     flex: 1;

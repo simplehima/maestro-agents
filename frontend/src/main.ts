@@ -313,10 +313,39 @@ function switchView(viewName: string) {
 
   if (viewName === 'projects') {
     loadProjects();
+  } else if (viewName === 'agents') {
+    const activeTab = document.querySelector('.log-tab.active');
+    const agent = activeTab?.getAttribute('data-agent');
+    if (agent) loadAgentLogs(agent);
+  }
+}
+
+// === Agent Logs ===
+async function loadAgentLogs(agent: string) {
+  const viewer = document.getElementById('agent-log-viewer');
+  if (!viewer) return;
+
+  viewer.innerHTML = '<pre>Loading logs...</pre>';
+
+  try {
+    const response = await fetch(`${API_URL}/logs/${agent}`);
+    const data = await response.json();
+    viewer.innerHTML = `<pre>${data.logs}</pre>`;
+  } catch (error) {
+    viewer.innerHTML = `<pre>Error loading logs: ${error}</pre>`;
   }
 }
 
 // === Event Listeners ===
+document.querySelectorAll('.log-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.log-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const agent = tab.getAttribute('data-agent');
+    if (agent) loadAgentLogs(agent);
+  });
+});
+
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const view = btn.getAttribute('data-view');
