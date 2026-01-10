@@ -6,3 +6,6 @@ uvicorn[standard]
 websockets
 pydantic
 pyinstaller
+aiosqlite
+python-multipart
+pywebview

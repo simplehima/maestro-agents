@@ -37,14 +37,16 @@ def install_python_deps():
     """Install Python dependencies"""
     print("\n=== Installing Python Dependencies ===")
     run_command([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+    # Ensure pywebview is installed with EdgeChromium support for Windows
+    run_command([sys.executable, "-m", "pip", "install", "pywebview[cef]"], check=False)
 
 def build_executable():
     """Build the executable with PyInstaller"""
-    print("\n=== Building Executable ===")
+    print("\n=== Building Desktop Application ===")
     run_command([sys.executable, "-m", "PyInstaller", "build.spec", "--clean"])
     
     print("\n=== Build Complete! ===")
-    print(f"Executable created at: {PROJECT_ROOT / 'dist' / 'MaestroV2.exe'}")
+    print(f"Desktop Application created at: {PROJECT_ROOT / 'dist' / 'MaestroV2.exe'}")
 
 def create_release_package():
     """Create a release folder with the EXE and an installer script"""
@@ -135,10 +137,11 @@ def main():
     create_release_package()
     
     print("\n" + "=" * 50)
-    print("SUCCESS! Your Maestro V2 Build is ready.")
+    print("SUCCESS! Your Maestro V2 Desktop App is ready.")
     print("=" * 50)
-    print("\nCheck the 'release' folder for the integrated EXE and Installer.")
-    print("NOTE: Ollama must be installed and running separately.")
+    print("\nCheck the 'release' folder for the Desktop EXE and Installer.")
+    print("The app will open in a native Windows window (no browser needed).")
+    print("\nNOTE: Ollama must be installed and running separately.")
     print("Download Ollama from: https://ollama.ai")
 
 if __name__ == "__main__":

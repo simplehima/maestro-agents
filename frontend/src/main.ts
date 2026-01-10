@@ -23,10 +23,13 @@ const projectsGrid = document.getElementById('projects-grid');
 
 const agentCards: Record<string, HTMLElement | null> = {
   'Orchestrator': document.getElementById('agent-orchestrator'),
+  'Research': document.getElementById('agent-research'),
   'UI/UX Designer': document.getElementById('agent-uiux'),
   'Developer': document.getElementById('agent-dev'),
+  'Security': document.getElementById('agent-security'),
   'QA Tester': document.getElementById('agent-qa'),
-  'Refiner': document.getElementById('agent-orchestrator')
+  'Documentation': document.getElementById('agent-docs'),
+  'Refiner': document.getElementById('agent-refiner')
 };
 
 // Initialize Lucide icons
@@ -120,9 +123,12 @@ function getAgentIcon(agent: string): string {
   const icons: Record<string, string> = {
     'System': 'info',
     'Orchestrator': 'brain',
+    'Research': 'search',
     'UI/UX Designer': 'palette',
     'Developer': 'code-2',
+    'Security': 'lock',
     'QA Tester': 'shield-check',
+    'Documentation': 'file-text',
     'User': 'user',
     'Refiner': 'sparkles'
   };
