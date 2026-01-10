@@ -249,23 +249,30 @@ async def analyze_project_path(req: ImportProjectRequest):
 
 @app.get("/logs/{agent}")
 async def get_agent_logs(agent: str):
-    if not project_manager.current_project:
-        return {"logs": "No active project. Start or open a project first."}
-    
-    # Initialize MemoryStore with the current project path
-    memory = MemoryStore(project_manager.current_project.path)
-    # Fetch logs for the specified agent
-    # We use a naming mapping for frontend to internal agent names if needed
-    agent_map = {
-        "uiux": "UI/UX Designer",
-        "developer": "Developer",
-        "qa": "QA Tester",
-        "orchestrator": "Orchestrator"
-    }
-    target_agent = agent_map.get(agent.lower(), agent)
-    content = memory.read_other_agent_logs(target_agent, limit=5)
-    
-    return {"logs": content if content else f"No logs found for {target_agent} yet."}
+    try:
+        if not project_manager.current_project:
+            return {"logs": "No active project. Start or open a project first."}
+        
+        # Initialize MemoryStore with the current project path
+        memory = MemoryStore(project_manager.current_project.path)
+        # Fetch logs for the specified agent
+        # We use a naming mapping for frontend to internal agent names if needed
+        agent_map = {
+            "orchestrator": "Orchestrator",
+            "research": "Research",
+            "uiux": "UI/UX Designer",
+            "developer": "Developer",
+            "security": "Security",
+            "qa": "QA Tester",
+            "documentation": "Documentation",
+            "refiner": "Refiner"
+        }
+        target_agent = agent_map.get(agent.lower(), agent.title())
+        content = memory.read_other_agent_logs(target_agent, limit=5)
+        
+        return {"logs": content if content else f"No logs found for {target_agent} yet."}
+    except Exception as e:
+        return {"logs": f"Error loading logs: {str(e)}"}
 
 # Model Configuration Endpoints
 @app.get("/models/presets")
