@@ -1,4 +1,4 @@
-name: Release
+name: Multi-Platform Release
 
 on:
   push:
@@ -11,16 +11,36 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     
     steps:
     - uses: actions/checkout@v4
 
     - name: Create Release
+      id: create_release
       uses: softprops/action-gh-release@v1
       with:
         generate_release_notes: true
         draft: false
         prerelease: false
+        body: |
+          ## Maestro V2 Release
+          
+          ### 🚀 Features
+          - Multi-agent AI orchestration with 8 specialized agents
+          - Native desktop application (Windows, Linux)
+          - Web version available
+          - Screenshot/Vision tool for visual verification
+          - SQLite database persistence
+          
+          ### 📦 Downloads
+          - **Windows**: `MaestroV2-Windows.exe`
+          - **Linux**: `MaestroV2-Linux`
+          - **Web Build**: `maestro-web.zip`
+          
+          ### 👤 Created by
+          [HimaAzab](https://github.com/simplehima) | [Portfolio](https://ibrahim-azab.com/)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,7 +65,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyinstaller pywebview
+        pip install pyinstaller pywebview mss pillow
 
     - name: Build Frontend
       working-directory: ./frontend
@@ -56,9 +76,171 @@ jobs:
     - name: Build Windows Executable
       run: python -m PyInstaller build.spec --clean
 
+    - name: Rename Windows Executable
+      run: mv dist/MaestroV2.exe dist/MaestroV2-Windows.exe
+
     - name: Upload Windows Executable
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/MaestroV2.exe
+        files: dist/MaestroV2-Windows.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    needs: create-release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-dev python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.1
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller mss pillow
+
+    - name: Build Frontend
+      working-directory: ./frontend
+      run: |
+        npm ci
+        npm run build
+
+    - name: Create Linux spec file
+      run: |
+        cat > linux_build.spec << 'EOF'
+        # -*- mode: python ; coding: utf-8 -*-
+        import os
+        from pathlib import Path
+        block_cipher = None
+        project_root = Path(SPECPATH)
+        a = Analysis(
+            ['app.py'],
+            pathex=[str(project_root)],
+            binaries=[],
+            datas=[
+                ('frontend/dist', 'frontend/dist'),
+                ('config.py', '.'),
+                ('project_manager.py', '.'),
+                ('memory_store.py', '.'),
+                ('maestro.py', '.'),
+                ('database.py', '.'),
+                ('workflow_engine.py', '.'),
+                ('settings_manager.py', '.'),
+                ('agents', 'agents'),
+                ('tools', 'tools'),
+            ],
+            hiddenimports=[
+                'uvicorn.logging', 'uvicorn.loops', 'uvicorn.loops.auto',
+                'uvicorn.protocols', 'uvicorn.protocols.http', 'uvicorn.protocols.http.auto',
+                'uvicorn.protocols.websockets', 'uvicorn.protocols.websockets.auto',
+                'uvicorn.lifespan', 'uvicorn.lifespan.on',
+                'httpx', 'rich', 'sqlite3', 'aiosqlite',
+                'fastapi', 'starlette', 'pydantic',
+                'agents', 'agents.specialized',
+                'tools', 'tools.file_tool', 'tools.web_search_tool', 
+                'tools.code_executor', 'tools.screenshot_tool',
+            ],
+            hookspath=[],
+            runtime_hooks=[],
+            excludes=[],
+            cipher=block_cipher,
+            noarchive=False,
+        )
+        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+        exe = EXE(
+            pyz, a.scripts, a.binaries, a.zipfiles, a.datas, [],
+            name='MaestroV2-Linux',
+            debug=False, strip=False, upx=True, console=True,
+            runtime_tmpdir=None,
+        )
+        EOF
+
+    - name: Build Linux Executable
+      run: python -m PyInstaller linux_build.spec --clean
+
+    - name: Upload Linux Executable
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/MaestroV2-Linux
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-web:
+    needs: create-release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Build Frontend
+      working-directory: ./frontend
+      run: |
+        npm ci
+        npm run build
+
+    - name: Create Web Bundle
+      run: |
+        mkdir -p maestro-web
+        cp -r frontend/dist maestro-web/
+        cp app.py maestro-web/
+        cp config.py maestro-web/
+        cp project_manager.py maestro-web/
+        cp memory_store.py maestro-web/
+        cp maestro.py maestro-web/
+        cp database.py maestro-web/
+        cp workflow_engine.py maestro-web/
+        cp settings_manager.py maestro-web/
+        cp requirements.txt maestro-web/
+        cp -r agents maestro-web/
+        cp -r tools maestro-web/
+        
+        # Create run script
+        cat > maestro-web/run.sh << 'EOF'
+        #!/bin/bash
+        echo "Starting Maestro V2 Web Server..."
+        pip install -r requirements.txt
+        python app.py
+        EOF
+        chmod +x maestro-web/run.sh
+        
+        # Create Windows run script
+        cat > maestro-web/run.bat << 'EOF'
+        @echo off
+        echo Starting Maestro V2 Web Server...
+        pip install -r requirements.txt
+        python app.py
+        EOF
+        
+        zip -r maestro-web.zip maestro-web
+
+    - name: Upload Web Bundle
+      uses: softprops/action-gh-release@v1
+      with:
+        files: maestro-web.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

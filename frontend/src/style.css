@@ -244,6 +244,123 @@ body {
     color: var(--accent-primary);
 }
 
+/* About Section */
+.about-section {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.about-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.about-header svg {
+    width: 12px;
+    height: 12px;
+    color: var(--accent-primary);
+}
+
+.creator-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(168, 85, 247, 0.05);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.creator-link:hover {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: var(--border-glow);
+    transform: translateY(-1px);
+}
+
+.creator-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-primary);
+}
+
+.creator-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.creator-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.creator-handle {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.creator-link>svg {
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.creator-link:hover>svg {
+    color: var(--accent-primary);
+}
+
+.portfolio-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.portfolio-link:hover {
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--accent-primary);
+}
+
+.portfolio-link svg {
+    width: 12px;
+    height: 12px;
+}
+
+.app-version {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.app-version span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
 /* ===== MAIN CONTENT ===== */
 .main-content {
     flex: 1;
