@@ -11,14 +11,11 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
     
     steps:
     - uses: actions/checkout@v4
 
     - name: Create Release
-      id: create_release
       uses: softprops/action-gh-release@v1
       with:
         generate_release_notes: true
@@ -27,20 +24,18 @@ jobs:
         body: |
           ## Maestro V2 Release
           
-          ### 🚀 Features
+          ### Features
           - Multi-agent AI orchestration with 8 specialized agents
           - Native desktop application (Windows, Linux)
           - Web version available
           - Screenshot/Vision tool for visual verification
-          - SQLite database persistence
           
-          ### 📦 Downloads
-          - **Windows**: `MaestroV2-Windows.exe`
-          - **Linux**: `MaestroV2-Linux`
-          - **Web Build**: `maestro-web.zip`
+          ### Downloads
+          - Windows: MaestroV2-Windows.exe
+          - Linux: MaestroV2-Linux
+          - Web Build: maestro-web.zip
           
-          ### 👤 Created by
-          [HimaAzab](https://github.com/simplehima) | [Portfolio](https://ibrahim-azab.com/)
+          Created by HimaAzab - https://ibrahim-azab.com/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -74,51 +69,9 @@ jobs:
         npm run build
 
     - name: Build Windows Executable
+      shell: cmd
       run: |
-        python -c "
-import PyInstaller.__main__
-import os
-
-PyInstaller.__main__.run([
-    'desktop_app.py',
-    '--name=MaestroV2',
-    '--onefile',
-    '--windowed',
-    '--add-data=frontend/dist;frontend/dist',
-    '--add-data=config.py;.',
-    '--add-data=project_manager.py;.',
-    '--add-data=memory_store.py;.',
-    '--add-data=maestro.py;.',
-    '--add-data=app.py;.',
-    '--add-data=database.py;.',
-    '--add-data=workflow_engine.py;.',
-    '--add-data=settings_manager.py;.',
-    '--add-data=agents;agents',
-    '--add-data=tools;tools',
-    '--hidden-import=uvicorn.logging',
-    '--hidden-import=uvicorn.loops.auto',
-    '--hidden-import=uvicorn.protocols.http.auto',
-    '--hidden-import=uvicorn.protocols.websockets.auto',
-    '--hidden-import=uvicorn.lifespan.on',
-    '--hidden-import=httpx',
-    '--hidden-import=rich',
-    '--hidden-import=sqlite3',
-    '--hidden-import=aiosqlite',
-    '--hidden-import=fastapi',
-    '--hidden-import=starlette',
-    '--hidden-import=pydantic',
-    '--hidden-import=webview',
-    '--hidden-import=agents',
-    '--hidden-import=agents.specialized',
-    '--hidden-import=tools',
-    '--hidden-import=tools.file_tool',
-    '--hidden-import=tools.web_search_tool',
-    '--hidden-import=tools.code_executor',
-    '--hidden-import=tools.screenshot_tool',
-    '--clean',
-    '--noconfirm',
-])
-"
+        pyinstaller --name=MaestroV2 --onefile --windowed --add-data "frontend/dist;frontend/dist" --add-data "config.py;." --add-data "project_manager.py;." --add-data "memory_store.py;." --add-data "maestro.py;." --add-data "app.py;." --add-data "database.py;." --add-data "workflow_engine.py;." --add-data "settings_manager.py;." --add-data "agents;agents" --add-data "tools;tools" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.protocols.websockets.auto --hidden-import=uvicorn.lifespan.on --hidden-import=httpx --hidden-import=rich --hidden-import=sqlite3 --hidden-import=aiosqlite --hidden-import=fastapi --hidden-import=starlette --hidden-import=pydantic --hidden-import=webview --hidden-import=agents --hidden-import=agents.specialized --hidden-import=tools --hidden-import=tools.file_tool --hidden-import=tools.web_search_tool --hidden-import=tools.code_executor --hidden-import=tools.screenshot_tool --clean --noconfirm desktop_app.py
 
     - name: Rename Windows Executable
       run: mv dist/MaestroV2.exe dist/MaestroV2-Windows.exe
@@ -147,11 +100,6 @@ PyInstaller.__main__.run([
       with:
         node-version: '20'
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-dev
-
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -166,46 +114,7 @@ PyInstaller.__main__.run([
 
     - name: Build Linux Executable
       run: |
-        python -c "
-import PyInstaller.__main__
-
-PyInstaller.__main__.run([
-    'app.py',
-    '--name=MaestroV2-Linux',
-    '--onefile',
-    '--add-data=frontend/dist:frontend/dist',
-    '--add-data=config.py:.',
-    '--add-data=project_manager.py:.',
-    '--add-data=memory_store.py:.',
-    '--add-data=maestro.py:.',
-    '--add-data=database.py:.',
-    '--add-data=workflow_engine.py:.',
-    '--add-data=settings_manager.py:.',
-    '--add-data=agents:agents',
-    '--add-data=tools:tools',
-    '--hidden-import=uvicorn.logging',
-    '--hidden-import=uvicorn.loops.auto',
-    '--hidden-import=uvicorn.protocols.http.auto',
-    '--hidden-import=uvicorn.protocols.websockets.auto',
-    '--hidden-import=uvicorn.lifespan.on',
-    '--hidden-import=httpx',
-    '--hidden-import=rich',
-    '--hidden-import=sqlite3',
-    '--hidden-import=aiosqlite',
-    '--hidden-import=fastapi',
-    '--hidden-import=starlette',
-    '--hidden-import=pydantic',
-    '--hidden-import=agents',
-    '--hidden-import=agents.specialized',
-    '--hidden-import=tools',
-    '--hidden-import=tools.file_tool',
-    '--hidden-import=tools.web_search_tool',
-    '--hidden-import=tools.code_executor',
-    '--hidden-import=tools.screenshot_tool',
-    '--clean',
-    '--noconfirm',
-])
-"
+        pyinstaller --name=MaestroV2-Linux --onefile --add-data "frontend/dist:frontend/dist" --add-data "config.py:." --add-data "project_manager.py:." --add-data "memory_store.py:." --add-data "maestro.py:." --add-data "database.py:." --add-data "workflow_engine.py:." --add-data "settings_manager.py:." --add-data "agents:agents" --add-data "tools:tools" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.protocols.websockets.auto --hidden-import=uvicorn.lifespan.on --hidden-import=httpx --hidden-import=rich --hidden-import=sqlite3 --hidden-import=aiosqlite --hidden-import=fastapi --hidden-import=starlette --hidden-import=pydantic --hidden-import=agents --hidden-import=agents.specialized --hidden-import=tools --hidden-import=tools.file_tool --hidden-import=tools.web_search_tool --hidden-import=tools.code_executor --hidden-import=tools.screenshot_tool --clean --noconfirm app.py
 
     - name: Upload Linux Executable
       uses: softprops/action-gh-release@v1
@@ -225,11 +134,6 @@ PyInstaller.__main__.run([
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
 
     - name: Build Frontend
       working-directory: ./frontend
@@ -252,24 +156,10 @@ PyInstaller.__main__.run([
         cp requirements.txt maestro-web/
         cp -r agents maestro-web/
         cp -r tools maestro-web/
-        
-        # Create run script
-        cat > maestro-web/run.sh << 'EOF'
-        #!/bin/bash
-        echo "Starting Maestro V2 Web Server..."
-        pip install -r requirements.txt
-        python app.py
-        EOF
+        echo "#!/bin/bash" > maestro-web/run.sh
+        echo "pip install -r requirements.txt" >> maestro-web/run.sh
+        echo "python app.py" >> maestro-web/run.sh
         chmod +x maestro-web/run.sh
-        
-        # Create Windows run script
-        cat > maestro-web/run.bat << 'EOF'
-        @echo off
-        echo Starting Maestro V2 Web Server...
-        pip install -r requirements.txt
-        python app.py
-        EOF
-        
         zip -r maestro-web.zip maestro-web
 
     - name: Upload Web Bundle
