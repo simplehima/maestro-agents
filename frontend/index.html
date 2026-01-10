@@ -309,7 +309,60 @@
         </header>
         <div class="settings-container">
           <div class="settings-group">
-            <h3>Model Configuration</h3>
+            <h3><i data-lucide="server" style="width:18px;height:18px;margin-right:8px;"></i>Ollama Server</h3>
+            <div class="ollama-status-row">
+              <div class="ollama-status">
+                <span class="status-dot" id="ollama-status-dot"></span>
+                <span id="ollama-status-text">Checking...</span>
+              </div>
+              <button id="refresh-ollama-btn" class="icon-btn" title="Refresh">
+                <i data-lucide="refresh-cw"></i>
+              </button>
+            </div>
+            <div class="setting-item">
+              <label>Ollama URL</label>
+              <input type="text" id="ollama-url" value="http://localhost:11434">
+            </div>
+            <div class="setting-item">
+              <button id="start-ollama-btn" class="secondary-btn">
+                <i data-lucide="play"></i>
+                Start Ollama Server
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3><i data-lucide="box" style="width:18px;height:18px;margin-right:8px;"></i>Downloaded Models</h3>
+            <div id="model-list" class="model-list">
+              <div class="empty-state">Loading models...</div>
+            </div>
+            <div class="setting-item model-download">
+              <label>Download New Model</label>
+              <div class="input-row">
+                <select id="model-to-download">
+                  <option value="llama3:8b">Llama 3 (8B) - Recommended</option>
+                  <option value="llama3:70b">Llama 3 (70B) - Large</option>
+                  <option value="mistral:7b">Mistral (7B)</option>
+                  <option value="codellama:7b">CodeLlama (7B)</option>
+                  <option value="deepseek-coder:6.7b">DeepSeek Coder (6.7B)</option>
+                  <option value="phi3:mini">Phi-3 Mini</option>
+                </select>
+                <button id="download-model-btn" class="secondary-btn">
+                  <i data-lucide="download"></i>
+                  Download
+                </button>
+              </div>
+              <div id="download-progress" class="download-progress hidden">
+                <div class="progress-bar">
+                  <div class="progress-fill" id="download-progress-fill"></div>
+                </div>
+                <span id="download-status">Downloading...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Model Preset</h3>
             <div class="setting-item">
               <label>Default Preset</label>
               <select id="default-preset">
@@ -318,10 +371,6 @@
                 <option value="advanced">Advanced</option>
                 <option value="cloud">Cloud APIs</option>
               </select>
-            </div>
-            <div class="setting-item">
-              <label>Ollama URL</label>
-              <input type="text" id="ollama-url" value="http://localhost:11434">
             </div>
           </div>
           <div class="settings-group">

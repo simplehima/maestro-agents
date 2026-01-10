@@ -499,9 +499,147 @@ importProjectBtn?.addEventListener('click', async () => {
     }
   } catch (error) {
     addLog('System', `Error importing project: ${error}`);
-  } finally {
     importProjectBtn.disabled = false;
     importProjectBtn.innerHTML = '<i data-lucide="file-input"></i> Import & Continue Working';
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 });
+
+// === Ollama Management ===
+const ollamaStatusDot = document.getElementById('ollama-status-dot');
+const ollamaStatusText = document.getElementById('ollama-status-text');
+const refreshOllamaBtn = document.getElementById('refresh-ollama-btn');
+const startOllamaBtn = document.getElementById('start-ollama-btn');
+const modelList = document.getElementById('model-list');
+const downloadModelBtn = document.getElementById('download-model-btn');
+const modelToDownload = document.getElementById('model-to-download') as HTMLSelectElement;
+const downloadProgress = document.getElementById('download-progress');
+const downloadStatus = document.getElementById('download-status');
+
+async function checkOllamaStatus() {
+  if (!ollamaStatusDot || !ollamaStatusText) return;
+
+  ollamaStatusText.textContent = 'Checking...';
+
+  try {
+    const response = await fetch(`${API_URL}/ollama/status`);
+    const data = await response.json();
+
+    if (data.online) {
+      ollamaStatusDot.classList.add('online');
+      ollamaStatusDot.classList.remove('offline');
+      ollamaStatusText.textContent = 'Running';
+      if (startOllamaBtn) startOllamaBtn.classList.add('hidden');
+      loadOllamaModels();
+    } else {
+      ollamaStatusDot.classList.add('offline');
+      ollamaStatusDot.classList.remove('online');
+      ollamaStatusText.textContent = 'Not Running';
+      if (startOllamaBtn) startOllamaBtn.classList.remove('hidden');
+      if (modelList) modelList.innerHTML = '<div class="empty-state">Start Ollama to see models</div>';
+    }
+  } catch (error) {
+    ollamaStatusDot.classList.add('offline');
+    ollamaStatusDot.classList.remove('online');
+    ollamaStatusText.textContent = 'Error';
+  }
+}
+
+async function loadOllamaModels() {
+  if (!modelList) return;
+
+  try {
+    const response = await fetch(`${API_URL}/ollama/models`);
+    const data = await response.json();
+
+    if (data.success && data.models.length > 0) {
+      modelList.innerHTML = data.models.map((m: any) => `
+        <div class="model-item">
+          <div class="model-info">
+            <span class="model-name">${m.name}</span>
+            <span class="model-size">${formatBytes(m.size)}</span>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      modelList.innerHTML = '<div class="empty-state">No models downloaded yet</div>';
+    }
+  } catch (error) {
+    modelList.innerHTML = '<div class="empty-state">Failed to load models</div>';
+  }
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+refreshOllamaBtn?.addEventListener('click', checkOllamaStatus);
+
+startOllamaBtn?.addEventListener('click', async () => {
+  try {
+    const response = await fetch(`${API_URL}/ollama/start`, { method: 'POST' });
+    const data = await response.json();
+
+    if (data.success) {
+      addLog('System', 'Ollama server starting...');
+      setTimeout(checkOllamaStatus, 2000);
+    } else {
+      addLog('System', `Failed to start Ollama: ${data.error}`);
+    }
+  } catch (error) {
+    addLog('System', `Error starting Ollama: ${error}`);
+  }
+});
+
+downloadModelBtn?.addEventListener('click', async () => {
+  const modelName = modelToDownload?.value;
+  if (!modelName) return;
+
+  if (downloadProgress) downloadProgress.classList.remove('hidden');
+  if (downloadStatus) downloadStatus.textContent = `Downloading ${modelName}...`;
+  if (downloadModelBtn) downloadModelBtn.disabled = true;
+
+  try {
+    const response = await fetch(`${API_URL}/ollama/pull`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: modelName })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      addLog('System', `Started downloading ${modelName}. This may take a while.`);
+      if (downloadStatus) downloadStatus.textContent = 'Download started in background...';
+
+      // Poll for completion
+      const checkInterval = setInterval(async () => {
+        await loadOllamaModels();
+        const models = modelList?.querySelectorAll('.model-name');
+        const downloaded = Array.from(models || []).some((m: any) => m.textContent?.includes(modelName.split(':')[0]));
+        if (downloaded) {
+          clearInterval(checkInterval);
+          if (downloadProgress) downloadProgress.classList.add('hidden');
+          addLog('System', `Model ${modelName} downloaded successfully!`);
+        }
+      }, 5000);
+
+      setTimeout(() => clearInterval(checkInterval), 300000); // Stop after 5 min
+    } else {
+      addLog('System', `Failed to download: ${data.error}`);
+      if (downloadProgress) downloadProgress.classList.add('hidden');
+    }
+  } catch (error) {
+    addLog('System', `Error downloading model: ${error}`);
+    if (downloadProgress) downloadProgress.classList.add('hidden');
+  } finally {
+    if (downloadModelBtn) downloadModelBtn.disabled = false;
+  }
+});
+
+// Check Ollama status on page load
+setTimeout(checkOllamaStatus, 1000);

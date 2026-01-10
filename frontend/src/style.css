@@ -1255,3 +1255,126 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ===== OLLAMA MANAGEMENT ===== */
+.ollama-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+}
+
+.ollama-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.status-dot.online {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.status-dot.offline {
+    background: var(--error);
+}
+
+.model-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.model-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(168, 85, 247, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.model-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.model-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.model-size {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.model-download .input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.model-download select {
+    flex: 1;
+}
+
+.download-progress {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.download-progress.hidden {
+    display: none;
+}
+
+.progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    width: 100%;
+    animation: progress-pulse 2s ease-in-out infinite;
+}
+
+@keyframes progress-pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+#download-status {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.hidden {
+    display: none !important;
+}

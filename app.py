@@ -277,6 +277,82 @@ async def set_preset(req: ModelPresetRequest):
     success = set_model_preset(req.preset)
     return {"success": success}
 
+# Ollama Management Endpoints
+@app.get("/ollama/status")
+async def get_ollama_status():
+    """Check if Ollama server is running and get version"""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(f"{OLLAMA_API_URL.replace('/api/generate', '')}")
+            if response.status_code == 200:
+                return {"online": True, "message": "Ollama is running"}
+            return {"online": False, "message": f"Ollama returned status {response.status_code}"}
+    except Exception as e:
+        return {"online": False, "message": f"Ollama not reachable: {str(e)}"}
+
+@app.get("/ollama/models")
+async def list_ollama_models():
+    """Get list of downloaded Ollama models"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"{OLLAMA_API_URL.replace('/api/generate', '/api/tags')}")
+            if response.status_code == 200:
+                data = response.json()
+                models = data.get("models", [])
+                return {
+                    "success": True,
+                    "models": [
+                        {
+                            "name": m.get("name", "unknown"),
+                            "size": m.get("size", 0),
+                            "modified": m.get("modified_at", "")
+                        }
+                        for m in models
+                    ]
+                }
+            return {"success": False, "models": [], "error": "Failed to fetch models"}
+    except Exception as e:
+        return {"success": False, "models": [], "error": str(e)}
+
+class ModelPullRequest(BaseModel):
+    name: str
+
+@app.post("/ollama/pull")
+async def pull_ollama_model(req: ModelPullRequest):
+    """Start downloading an Ollama model"""
+    import subprocess
+    try:
+        # Start ollama pull in background
+        process = subprocess.Popen(
+            ["ollama", "pull", req.name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+        return {"success": True, "message": f"Started downloading {req.name}"}
+    except FileNotFoundError:
+        return {"success": False, "error": "Ollama not found. Please install Ollama first."}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/ollama/start")
+async def start_ollama_server():
+    """Try to start Ollama server"""
+    import subprocess
+    try:
+        # Try to start ollama serve in background
+        subprocess.Popen(
+            ["ollama", "serve"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        )
+        return {"success": True, "message": "Ollama server starting..."}
+    except FileNotFoundError:
+        return {"success": False, "error": "Ollama not found. Please install from https://ollama.ai"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 # Orchestration Endpoints
 @app.post("/start")
 async def start_project(req: ObjectiveRequest):
