@@ -75,6 +75,10 @@ class GuidanceRequest(BaseModel):
 class ProjectRequest(BaseModel):
     name: str
 
+class ImportProjectRequest(BaseModel):
+    path: str
+    name: Optional[str] = None
+
 class ModelPresetRequest(BaseModel):
     preset: str
 
@@ -208,6 +212,40 @@ async def open_project(path: str):
 async def delete_project(path: str):
     project_manager.delete_project(path)
     return {"success": True}
+
+@app.post("/projects/import")
+async def import_existing_project(req: ImportProjectRequest):
+    """Import an existing external project directory"""
+    try:
+        project = project_manager.import_existing_project(req.path, req.name)
+        return {
+            "success": True,
+            "path": str(project.path),
+            "name": project.name,
+            "project_type": project.config.get("project_type", {}),
+            "is_external": True
+        }
+    except FileNotFoundError as e:
+        return {"success": False, "error": str(e)}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/projects/analyze")
+async def analyze_project_path(req: ImportProjectRequest):
+    """Analyze a directory to detect project type without importing"""
+    try:
+        path = Path(req.path)
+        if not path.exists():
+            return {"success": False, "error": "Directory not found"}
+        
+        project_type = project_manager._analyze_project_type(path)
+        return {
+            "success": True,
+            "path": str(path),
+            "project_type": project_type
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 @app.get("/logs/{agent}")
 async def get_agent_logs(agent: str):

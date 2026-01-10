@@ -575,6 +575,97 @@ body {
     background: rgba(255, 255, 255, 0.05);
 }
 
+/* Open Existing Project */
+.divider-or {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.divider-or::before,
+.divider-or::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--border-color);
+}
+
+.divider-or span {
+    padding: 0 1rem;
+}
+
+.open-existing-section {
+    padding: 1rem;
+    background: rgba(99, 102, 241, 0.05);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.open-existing-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.open-existing-section h3 svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-secondary);
+}
+
+.open-existing-section .hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.open-existing-section .input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.open-existing-section .input-row input {
+    flex: 1;
+    background: var(--bg-primary);
+}
+
+.project-type-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+.project-type-info.hidden {
+    display: none;
+}
+
+.type-badge,
+.lang-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.type-badge svg,
+.lang-badge svg {
+    width: 14px;
+    height: 14px;
+    color: var(--accent-primary);
+}
+
 /* ===== AGENT GRID ===== */
 .agent-section {
     margin-bottom: 1.5rem;

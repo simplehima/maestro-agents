@@ -113,6 +113,30 @@
                 <i data-lucide="play"></i>
                 Start Orchestration
               </button>
+              
+              <div class="divider-or">
+                <span>or</span>
+              </div>
+              
+              <div class="open-existing-section">
+                <h3><i data-lucide="folder-open"></i> Open Existing Project</h3>
+                <p class="hint">Work on an existing codebase (Flutter, React, Python, etc.)</p>
+                <div class="input-row">
+                  <input type="text" id="existing-path" placeholder="C:\path\to\your\project" readonly>
+                  <button id="browse-folder-btn" class="secondary-btn">
+                    <i data-lucide="folder-search"></i>
+                    Browse
+                  </button>
+                </div>
+                <div id="project-type-info" class="project-type-info hidden">
+                  <span class="type-badge"><i data-lucide="code-2"></i> <span id="detected-framework">Unknown</span></span>
+                  <span class="lang-badge"><i data-lucide="braces"></i> <span id="detected-language">Unknown</span></span>
+                </div>
+                <button id="import-project-btn" class="primary-btn" disabled>
+                  <i data-lucide="file-input"></i>
+                  Import & Continue Working
+                </button>
+              </div>
             </div>
           </div>
 
