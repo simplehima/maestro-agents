@@ -74,7 +74,51 @@ jobs:
         npm run build
 
     - name: Build Windows Executable
-      run: python -m PyInstaller build.spec --clean
+      run: |
+        python -c "
+import PyInstaller.__main__
+import os
+
+PyInstaller.__main__.run([
+    'desktop_app.py',
+    '--name=MaestroV2',
+    '--onefile',
+    '--windowed',
+    '--add-data=frontend/dist;frontend/dist',
+    '--add-data=config.py;.',
+    '--add-data=project_manager.py;.',
+    '--add-data=memory_store.py;.',
+    '--add-data=maestro.py;.',
+    '--add-data=app.py;.',
+    '--add-data=database.py;.',
+    '--add-data=workflow_engine.py;.',
+    '--add-data=settings_manager.py;.',
+    '--add-data=agents;agents',
+    '--add-data=tools;tools',
+    '--hidden-import=uvicorn.logging',
+    '--hidden-import=uvicorn.loops.auto',
+    '--hidden-import=uvicorn.protocols.http.auto',
+    '--hidden-import=uvicorn.protocols.websockets.auto',
+    '--hidden-import=uvicorn.lifespan.on',
+    '--hidden-import=httpx',
+    '--hidden-import=rich',
+    '--hidden-import=sqlite3',
+    '--hidden-import=aiosqlite',
+    '--hidden-import=fastapi',
+    '--hidden-import=starlette',
+    '--hidden-import=pydantic',
+    '--hidden-import=webview',
+    '--hidden-import=agents',
+    '--hidden-import=agents.specialized',
+    '--hidden-import=tools',
+    '--hidden-import=tools.file_tool',
+    '--hidden-import=tools.web_search_tool',
+    '--hidden-import=tools.code_executor',
+    '--hidden-import=tools.screenshot_tool',
+    '--clean',
+    '--noconfirm',
+])
+"
 
     - name: Rename Windows Executable
       run: mv dist/MaestroV2.exe dist/MaestroV2-Windows.exe
@@ -106,7 +150,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-dev python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.1
+        sudo apt-get install -y python3-dev
 
     - name: Install Python dependencies
       run: |
@@ -120,58 +164,48 @@ jobs:
         npm ci
         npm run build
 
-    - name: Create Linux spec file
-      run: |
-        cat > linux_build.spec << 'EOF'
-        # -*- mode: python ; coding: utf-8 -*-
-        import os
-        from pathlib import Path
-        block_cipher = None
-        project_root = Path(SPECPATH)
-        a = Analysis(
-            ['app.py'],
-            pathex=[str(project_root)],
-            binaries=[],
-            datas=[
-                ('frontend/dist', 'frontend/dist'),
-                ('config.py', '.'),
-                ('project_manager.py', '.'),
-                ('memory_store.py', '.'),
-                ('maestro.py', '.'),
-                ('database.py', '.'),
-                ('workflow_engine.py', '.'),
-                ('settings_manager.py', '.'),
-                ('agents', 'agents'),
-                ('tools', 'tools'),
-            ],
-            hiddenimports=[
-                'uvicorn.logging', 'uvicorn.loops', 'uvicorn.loops.auto',
-                'uvicorn.protocols', 'uvicorn.protocols.http', 'uvicorn.protocols.http.auto',
-                'uvicorn.protocols.websockets', 'uvicorn.protocols.websockets.auto',
-                'uvicorn.lifespan', 'uvicorn.lifespan.on',
-                'httpx', 'rich', 'sqlite3', 'aiosqlite',
-                'fastapi', 'starlette', 'pydantic',
-                'agents', 'agents.specialized',
-                'tools', 'tools.file_tool', 'tools.web_search_tool', 
-                'tools.code_executor', 'tools.screenshot_tool',
-            ],
-            hookspath=[],
-            runtime_hooks=[],
-            excludes=[],
-            cipher=block_cipher,
-            noarchive=False,
-        )
-        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-        exe = EXE(
-            pyz, a.scripts, a.binaries, a.zipfiles, a.datas, [],
-            name='MaestroV2-Linux',
-            debug=False, strip=False, upx=True, console=True,
-            runtime_tmpdir=None,
-        )
-        EOF
-
     - name: Build Linux Executable
-      run: python -m PyInstaller linux_build.spec --clean
+      run: |
+        python -c "
+import PyInstaller.__main__
+
+PyInstaller.__main__.run([
+    'app.py',
+    '--name=MaestroV2-Linux',
+    '--onefile',
+    '--add-data=frontend/dist:frontend/dist',
+    '--add-data=config.py:.',
+    '--add-data=project_manager.py:.',
+    '--add-data=memory_store.py:.',
+    '--add-data=maestro.py:.',
+    '--add-data=database.py:.',
+    '--add-data=workflow_engine.py:.',
+    '--add-data=settings_manager.py:.',
+    '--add-data=agents:agents',
+    '--add-data=tools:tools',
+    '--hidden-import=uvicorn.logging',
+    '--hidden-import=uvicorn.loops.auto',
+    '--hidden-import=uvicorn.protocols.http.auto',
+    '--hidden-import=uvicorn.protocols.websockets.auto',
+    '--hidden-import=uvicorn.lifespan.on',
+    '--hidden-import=httpx',
+    '--hidden-import=rich',
+    '--hidden-import=sqlite3',
+    '--hidden-import=aiosqlite',
+    '--hidden-import=fastapi',
+    '--hidden-import=starlette',
+    '--hidden-import=pydantic',
+    '--hidden-import=agents',
+    '--hidden-import=agents.specialized',
+    '--hidden-import=tools',
+    '--hidden-import=tools.file_tool',
+    '--hidden-import=tools.web_search_tool',
+    '--hidden-import=tools.code_executor',
+    '--hidden-import=tools.screenshot_tool',
+    '--clean',
+    '--noconfirm',
+])
+"
 
     - name: Upload Linux Executable
       uses: softprops/action-gh-release@v1
