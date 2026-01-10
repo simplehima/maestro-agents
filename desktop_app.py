@@ -54,6 +54,40 @@ def wait_for_server(host, port, timeout=30):
     return False
 
 
+class SingleInstanceLock:
+    """Prevent multiple instances of the application from running"""
+    
+    def __init__(self, lock_name="maestro_v2"):
+        self.lock_file = get_executable_dir() / f".{lock_name}.lock"
+        self.lock_socket = None
+        
+    def acquire(self):
+        """Try to acquire the lock. Returns True if successful."""
+        # Try socket-based lock (more reliable on Windows)
+        try:
+            self.lock_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # Bind to a specific port that only one instance can use
+            self.lock_socket.bind(('127.0.0.1', 47652))  # Arbitrary port for lock
+            return True
+        except OSError:
+            # Another instance is already running
+            return False
+    
+    def release(self):
+        """Release the lock"""
+        if self.lock_socket:
+            try:
+                self.lock_socket.close()
+            except:
+                pass
+        # Also clean up lock file if it exists
+        try:
+            if self.lock_file.exists():
+                self.lock_file.unlink()
+        except:
+            pass
+
+
 class MaestroDesktopApp:
     """Desktop application manager for Maestro V2"""
     
@@ -157,6 +191,24 @@ def main():
     )
     
     logger = logging.getLogger("maestro")
+    
+    # Check for existing instance
+    instance_lock = SingleInstanceLock()
+    if not instance_lock.acquire():
+        logger.warning("Another instance of Maestro V2 is already running!")
+        # Try to show a message box if possible
+        try:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(
+                0, 
+                "Maestro V2 is already running.\n\nPlease check your taskbar or system tray.",
+                "Maestro V2", 
+                0x40  # MB_ICONINFORMATION
+            )
+        except:
+            print("Maestro V2 is already running.")
+        sys.exit(0)
+    
     logger.info("Starting Maestro V2 Desktop Application")
     
     try:
@@ -167,6 +219,8 @@ def main():
         if getattr(sys, 'frozen', False):
             input("Press Enter to exit...")
         sys.exit(1)
+    finally:
+        instance_lock.release()
 
 
 if __name__ == "__main__":
