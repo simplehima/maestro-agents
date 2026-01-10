@@ -9,3 +9,5 @@ pyinstaller
 aiosqlite
 python-multipart
 pywebview
+mss
+pillow

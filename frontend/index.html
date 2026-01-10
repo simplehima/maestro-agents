@@ -288,6 +288,36 @@
               <input type="password" id="anthropic-key" placeholder="sk-ant-...">
             </div>
           </div>
+          <div class="settings-group">
+            <h3><i data-lucide="camera" style="width:18px;height:18px;margin-right:8px;"></i>Vision & Screenshots</h3>
+            <p class="settings-description">Allow AI agents to capture screenshots for visual verification of their
+              work.</p>
+            <div class="setting-item">
+              <label>Screenshot Permission</label>
+              <select id="screenshot-permission">
+                <option value="disabled">Disabled</option>
+                <option value="ask_every_time" selected>Ask Every Time</option>
+                <option value="allow_once">Allow Once (Session)</option>
+                <option value="always_allow">Always Allow</option>
+              </select>
+            </div>
+            <div class="setting-item checkbox-item">
+              <label>
+                <input type="checkbox" id="screenshot-audit" checked>
+                <span>Enable audit log for screenshots</span>
+              </label>
+            </div>
+            <div class="setting-item checkbox-item">
+              <label>
+                <input type="checkbox" id="screenshot-save">
+                <span>Save screenshots to project folder</span>
+              </label>
+            </div>
+            <div class="permission-indicator" id="vision-status">
+              <i data-lucide="eye-off"></i>
+              <span>Vision capability: Disabled</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>
