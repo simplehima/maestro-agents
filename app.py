@@ -247,6 +247,19 @@ async def analyze_project_path(req: ImportProjectRequest):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+@app.delete("/projects/{path:path}")
+async def delete_project(path: str):
+    """Delete a project"""
+    try:
+        import shutil
+        project_path = Path(path)
+        if project_path.exists():
+            shutil.rmtree(project_path)
+            return {"success": True, "message": "Project deleted"}
+        return {"success": False, "error": "Project not found"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 @app.get("/logs/{agent}")
 async def get_agent_logs(agent: str):
     try:

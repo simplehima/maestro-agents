@@ -516,6 +516,28 @@ body {
     border-color: var(--accent-primary);
 }
 
+/* ===== PROJECT CARDS ===== */
+.project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.project-card-header h3 {
+    margin: 0;
+}
+
+.delete-project-btn {
+    opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.delete-project-btn:hover {
+    opacity: 1;
+    color: var(--error);
+}
+
 /* ===== BUTTONS ===== */
 .primary-btn {
     display: inline-flex;

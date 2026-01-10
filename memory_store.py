@@ -87,6 +87,18 @@ class AgentMemory:
     def get_all_logs(self) -> List[Path]:
         return sorted(self.memory_dir.glob("session_*.md"), reverse=True)
     
+    def get_all_logs_content(self, limit: int = 5) -> str:
+        """Get actual content from log files"""
+        logs = self.get_all_logs()[:limit]
+        content = []
+        for log in logs:
+            try:
+                with open(log, 'r', encoding='utf-8') as f:
+                    content.append(f.read())
+            except Exception:
+                pass
+        return "\n\n---\n\n".join(content) if content else ""
+    
     def read_other_agent_logs(self, other_agent: str, limit: int = 1) -> str:
         """Read logs from another agent for context sharing"""
         other_dir = self.project_path / "agents" / other_agent.lower().replace(" ", "_").replace("/", "")
@@ -149,3 +161,24 @@ class MemoryStore:
                     agent_ctx += f"- [{entry.type}] {entry.content[:100]}...\n"
                 context_parts.append(agent_ctx)
         return "\n".join(context_parts)
+    
+    def read_other_agent_logs(self, agent_name: str, limit: int = 5) -> str:
+        """Read logs from an agent (wrapper for AgentMemory method)"""
+        # Check if agent has been initialized
+        if agent_name in self.agents:
+            return self.agents[agent_name].get_all_logs_content(limit)
+        
+        # Otherwise read directly from disk
+        agent_dir = self.project_path / "agents" / agent_name.lower().replace(" ", "_").replace("/", "")
+        if not agent_dir.exists():
+            return ""
+        
+        logs = sorted(agent_dir.glob("session_*.md"), reverse=True)[:limit]
+        content = []
+        for log in logs:
+            try:
+                with open(log, 'r', encoding='utf-8') as f:
+                    content.append(f.read())
+            except Exception:
+                pass
+        return "\n\n---\n\n".join(content) if content else ""

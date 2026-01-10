@@ -182,7 +182,12 @@ function renderProjects(projects: any[]) {
 
   projectsGrid.innerHTML = projects.map(p => `
         <div class="project-card" data-path="${p.path}">
-            <h3>${p.name}</h3>
+            <div class="project-card-header">
+              <h3>${p.name}</h3>
+              <button class="delete-project-btn icon-btn" data-path="${p.path}" title="Delete project">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
             <p class="objective">${p.objective || 'No objective set'}</p>
             <div class="meta">
                 <span class="status-badge ${p.status}">${p.status.replace('_', ' ')}</span>
@@ -191,10 +196,42 @@ function renderProjects(projects: any[]) {
         </div>
     `).join('');
 
-  // Add click handlers
+  // Add click handlers for opening projects
   projectsGrid.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('click', () => openProject(card.getAttribute('data-path') || ''));
+    card.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      // Don't open if clicking delete button
+      if (!target.closest('.delete-project-btn')) {
+        openProject(card.getAttribute('data-path') || '');
+      }
+    });
   });
+
+  // Add delete handlers
+  projectsGrid.querySelectorAll('.delete-project-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const path = (btn as HTMLElement).getAttribute('data-path');
+      if (path && confirm('Are you sure you want to delete this project?')) {
+        await deleteProject(path);
+      }
+    });
+  });
+
+  // Re-initialize icons
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+async function deleteProject(path: string) {
+  try {
+    await fetch(`${API_URL}/projects/${encodeURIComponent(path)}`, {
+      method: 'DELETE'
+    });
+    addLog('System', 'Project deleted');
+    loadProjects();
+  } catch (error) {
+    addLog('System', `Error deleting project: ${error}`);
+  }
 }
 
 function renderRecentProjects(projects: any[]) {
