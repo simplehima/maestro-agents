@@ -406,3 +406,102 @@ document.getElementById('new-project-btn')?.addEventListener('click', () => {
 // === Initialize ===
 connectWS();
 loadProjects();
+
+// === Browse Folder for Existing Project ===
+const browseFolderBtn = document.getElementById('browse-folder-btn');
+const existingPathInput = document.getElementById('existing-path') as HTMLInputElement;
+const importProjectBtn = document.getElementById('import-project-btn') as HTMLButtonElement;
+const projectTypeInfo = document.getElementById('project-type-info');
+const detectedFramework = document.getElementById('detected-framework');
+const detectedLanguage = document.getElementById('detected-language');
+
+// Check if pywebview API is available (desktop app mode)
+declare const pywebview: { api: { select_folder: () => Promise<string | null> } } | undefined;
+
+browseFolderBtn?.addEventListener('click', async () => {
+  try {
+    let folderPath: string | null = null;
+
+    // Try pywebview API first (desktop app)
+    if (typeof pywebview !== 'undefined' && pywebview.api) {
+      folderPath = await pywebview.api.select_folder();
+    } else {
+      // Fallback: prompt for path (web mode)
+      folderPath = prompt('Enter the full path to your project folder:');
+    }
+
+    if (folderPath && existingPathInput) {
+      existingPathInput.value = folderPath;
+
+      // Analyze the project
+      try {
+        const response = await fetch(`${API_URL}/projects/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: folderPath })
+        });
+
+        const data = await response.json();
+        if (data.success && data.project_type) {
+          // Show project type info
+          if (projectTypeInfo) projectTypeInfo.classList.remove('hidden');
+          if (detectedFramework) detectedFramework.textContent = data.project_type.framework || 'Unknown';
+          if (detectedLanguage) detectedLanguage.textContent = data.project_type.language || 'Unknown';
+          if (importProjectBtn) importProjectBtn.disabled = false;
+
+          // Re-initialize icons
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        } else {
+          addLog('System', `Could not analyze project: ${data.error || 'Unknown error'}`);
+          if (importProjectBtn) importProjectBtn.disabled = true;
+        }
+      } catch (error) {
+        addLog('System', `Error analyzing project: ${error}`);
+      }
+    }
+  } catch (error) {
+    addLog('System', `Error selecting folder: ${error}`);
+  }
+});
+
+importProjectBtn?.addEventListener('click', async () => {
+  const path = existingPathInput?.value;
+  if (!path) return;
+
+  importProjectBtn.disabled = true;
+  importProjectBtn.innerHTML = '<i data-lucide="loader-2"></i> Importing...';
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  try {
+    const response = await fetch(`${API_URL}/projects/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        path: path,
+        name: projectNameInput?.value || undefined
+      })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      addLog('System', `Imported project: ${data.name} (${data.project_type?.framework || 'Unknown'})`);
+
+      // Update UI
+      if (projectNameInput) projectNameInput.value = data.name;
+
+      // Clear import section
+      if (existingPathInput) existingPathInput.value = '';
+      if (projectTypeInfo) projectTypeInfo.classList.add('hidden');
+
+      loadProjects();
+    } else {
+      addLog('System', `Failed to import: ${data.error}`);
+    }
+  } catch (error) {
+    addLog('System', `Error importing project: ${error}`);
+  } finally {
+    importProjectBtn.disabled = false;
+    importProjectBtn.innerHTML = '<i data-lucide="file-input"></i> Import & Continue Working';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+});

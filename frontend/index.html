@@ -21,7 +21,7 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <span class="logo-icon">✦</span>
+          <img src="/logo.png" alt="Maestro" class="logo-icon-img">
           <span class="logo-text">Maestro</span>
           <span class="version-badge">V2</span>
         </div>
@@ -113,11 +113,11 @@
                 <i data-lucide="play"></i>
                 Start Orchestration
               </button>
-              
+
               <div class="divider-or">
                 <span>or</span>
               </div>
-              
+
               <div class="open-existing-section">
                 <h3><i data-lucide="folder-open"></i> Open Existing Project</h3>
                 <p class="hint">Work on an existing codebase (Flutter, React, Python, etc.)</p>
@@ -129,8 +129,10 @@
                   </button>
                 </div>
                 <div id="project-type-info" class="project-type-info hidden">
-                  <span class="type-badge"><i data-lucide="code-2"></i> <span id="detected-framework">Unknown</span></span>
-                  <span class="lang-badge"><i data-lucide="braces"></i> <span id="detected-language">Unknown</span></span>
+                  <span class="type-badge"><i data-lucide="code-2"></i> <span
+                      id="detected-framework">Unknown</span></span>
+                  <span class="lang-badge"><i data-lucide="braces"></i> <span
+                      id="detected-language">Unknown</span></span>
                 </div>
                 <button id="import-project-btn" class="primary-btn" disabled>
                   <i data-lucide="file-input"></i>
@@ -286,9 +288,13 @@
         <div class="agent-logs-container">
           <div class="agent-log-tabs">
             <button class="log-tab active" data-agent="orchestrator">Orchestrator</button>
+            <button class="log-tab" data-agent="research">Research</button>
             <button class="log-tab" data-agent="uiux">UI/UX</button>
             <button class="log-tab" data-agent="developer">Developer</button>
+            <button class="log-tab" data-agent="security">Security</button>
             <button class="log-tab" data-agent="qa">QA</button>
+            <button class="log-tab" data-agent="documentation">Documentation</button>
+            <button class="log-tab" data-agent="refiner">Refiner</button>
           </div>
           <div id="agent-log-viewer" class="agent-log-viewer">
             <pre>Select an agent to view their session logs...</pre>

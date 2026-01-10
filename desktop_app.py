@@ -100,6 +100,9 @@ class MaestroDesktopApp:
         
         url = f"http://127.0.0.1:{self.port}"
         
+        # Create API class for JavaScript to call
+        js_api = JsApi()
+        
         # Create and show the native window
         self.window = webview.create_window(
             title="Maestro V2 - AI Agent Platform",
@@ -110,6 +113,7 @@ class MaestroDesktopApp:
             resizable=True,
             confirm_close=True,
             text_select=True,
+            js_api=js_api,  # Expose Python API to JavaScript
         )
         
         # Start the webview (this blocks until window is closed)
@@ -119,6 +123,23 @@ class MaestroDesktopApp:
         )
         
         print("Maestro V2 closed.")
+
+
+class JsApi:
+    """Python API exposed to JavaScript via pywebview"""
+    
+    def select_folder(self):
+        """Open native folder selection dialog and return selected path"""
+        try:
+            result = webview.windows[0].create_file_dialog(
+                webview.FOLDER_DIALOG
+            )
+            if result and len(result) > 0:
+                return result[0]
+            return None
+        except Exception as e:
+            print(f"Error selecting folder: {e}")
+            return None
 
 
 def main():
