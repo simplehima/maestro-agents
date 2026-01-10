@@ -26,7 +26,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 # Default model (fallback for simpler tasks)
-DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "llama3:8b")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "llama3:latest")
 
 # Agent role names
 ORCHESTRATOR_NAME = "Orchestrator"
@@ -36,34 +36,34 @@ REFINER_NAME = "Refiner"
 # Model presets for different complexity levels
 MODEL_PRESETS = {
     "basic": {
-        "orchestrator": "llama3:8b",
-        "ui_ux": "llama3:8b",
-        "developer": "llama3:8b", 
-        "qa": "llama3:8b",
-        "refiner": "llama3:8b",
-        "research": "llama3:8b",
-        "security": "llama3:8b",
-        "documentation": "llama3:8b"
+        "orchestrator": "llama3:latest",
+        "ui_ux": "llama3:latest",
+        "developer": "llama3:latest", 
+        "qa": "llama3:latest",
+        "refiner": "llama3:latest",
+        "research": "llama3:latest",
+        "security": "llama3:latest",
+        "documentation": "llama3:latest"
     },
     "standard": {
-        "orchestrator": "llama3:70b",
-        "ui_ux": "deepseek-coder:6.7b",
-        "developer": "codellama:13b",
-        "qa": "llama3:8b",
-        "refiner": "llama3:8b",
-        "research": "llama3:8b",
-        "security": "llama3:8b",
-        "documentation": "llama3:8b"
+        "orchestrator": "llama3:latest",
+        "ui_ux": "llama3:latest",
+        "developer": "llama3:latest",
+        "qa": "llama3:latest",
+        "refiner": "llama3:latest",
+        "research": "llama3:latest",
+        "security": "llama3:latest",
+        "documentation": "llama3:latest"
     },
     "advanced": {
-        "orchestrator": "llama3:70b",
-        "ui_ux": "deepseek-coder:33b",
-        "developer": "codellama:34b",
-        "qa": "llama3:8b",
-        "refiner": "llama3:70b",
-        "research": "llama3:70b",
-        "security": "codellama:13b",
-        "documentation": "llama3:8b"
+        "orchestrator": "llama3:latest",
+        "ui_ux": "llama3:latest",
+        "developer": "llama3:latest",
+        "qa": "llama3:latest",
+        "refiner": "llama3:latest",
+        "research": "llama3:latest",
+        "security": "llama3:latest",
+        "documentation": "llama3:latest"
     },
     "cloud": {
         "orchestrator": "gpt-4o",
