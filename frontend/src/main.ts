@@ -680,3 +680,39 @@ downloadModelBtn?.addEventListener('click', async () => {
 
 // Check Ollama status on page load
 setTimeout(checkOllamaStatus, 1000);
+
+// === Model Backup ===
+const ollamaModelsPath = document.getElementById('ollama-models-path') as HTMLInputElement;
+const copyPathBtn = document.getElementById('copy-path-btn');
+const openModelsFolderBtn = document.getElementById('open-models-folder-btn');
+
+// Load Ollama models path
+async function loadOllamaModelsPath() {
+  try {
+    const response = await fetch(`${API_URL}/ollama/models-path`);
+    const data = await response.json();
+    if (data.path && ollamaModelsPath) {
+      ollamaModelsPath.value = data.path;
+    }
+  } catch (error) {
+    console.log('Could not load models path');
+  }
+}
+
+copyPathBtn?.addEventListener('click', () => {
+  const path = ollamaModelsPath?.value;
+  if (path) {
+    navigator.clipboard.writeText(path);
+    addLog('System', 'Models path copied to clipboard');
+  }
+});
+
+openModelsFolderBtn?.addEventListener('click', async () => {
+  try {
+    await fetch(`${API_URL}/ollama/open-models-folder`, { method: 'POST' });
+  } catch (error) {
+    addLog('System', `Could not open folder: ${error}`);
+  }
+});
+
+setTimeout(loadOllamaModelsPath, 1500);

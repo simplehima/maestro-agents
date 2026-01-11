@@ -373,6 +373,27 @@
               </select>
             </div>
           </div>
+
+          <div class="settings-group">
+            <h3><i data-lucide="hard-drive" style="width:18px;height:18px;margin-right:8px;"></i>Model Backup</h3>
+            <p class="settings-description">Copy your Ollama models to another PC for offline use.</p>
+            <div class="setting-item">
+              <label>Models Location</label>
+              <div class="input-row">
+                <input type="text" id="ollama-models-path" readonly value="C:\Users\[user]\.ollama\models"
+                  placeholder="Loading...">
+                <button id="copy-path-btn" class="secondary-btn" title="Copy path">
+                  <i data-lucide="copy"></i>
+                </button>
+              </div>
+            </div>
+            <div class="setting-item">
+              <button id="open-models-folder-btn" class="secondary-btn">
+                <i data-lucide="folder-open"></i>
+                Open Models Folder
+              </button>
+            </div>
+          </div>
           <div class="settings-group">
             <h3>Cloud API Keys</h3>
             <div class="setting-item">

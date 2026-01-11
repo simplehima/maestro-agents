@@ -373,16 +373,54 @@ async def start_ollama_server():
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+@app.get("/ollama/models-path")
+async def get_ollama_models_path():
+    """Get the path to Ollama models folder for backup"""
+    import os
+    # Ollama stores models in user home directory
+    if sys.platform == "win32":
+        models_path = os.path.expanduser("~\\.ollama\\models")
+    else:
+        models_path = os.path.expanduser("~/.ollama/models")
+    return {"path": models_path, "exists": os.path.exists(models_path)}
+
+@app.post("/ollama/open-models-folder")
+async def open_ollama_models_folder():
+    """Open Ollama models folder in file explorer"""
+    import os
+    import subprocess
+    
+    if sys.platform == "win32":
+        models_path = os.path.expanduser("~\\.ollama\\models")
+        if os.path.exists(models_path):
+            subprocess.Popen(f'explorer "{models_path}"')
+            return {"success": True}
+    else:
+        models_path = os.path.expanduser("~/.ollama/models")
+        if os.path.exists(models_path):
+            subprocess.Popen(['xdg-open', models_path])
+            return {"success": True}
+    return {"success": False, "error": "Models folder not found"}
+
 # Orchestration Endpoints
 @app.post("/start")
 async def start_project(req: ObjectiveRequest):
     project_id = str(uuid.uuid4())
     
-    # Create or use project
-    if req.project_name:
-        project = project_manager.create_project(req.project_name)
-    else:
-        project = project_manager.create_project(f"Project_{project_id[:8]}")
+    # Check if we should use existing project
+    project = None
+    if project_manager.current_project:
+        # Use current project if name matches or no name specified
+        current_name = project_manager.current_project.name
+        if not req.project_name or req.project_name == current_name:
+            project = project_manager.current_project
+    
+    # Create new project only if needed
+    if not project:
+        if req.project_name:
+            project = project_manager.create_project(req.project_name)
+        else:
+            project = project_manager.create_project(f"Project_{project_id[:8]}")
     
     project.set_objective(req.objective)
     memory_store = MemoryStore(project.path)
