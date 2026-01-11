@@ -21,17 +21,6 @@ const modelPresetSelect = document.getElementById('model-preset') as HTMLSelectE
 const recentProjectsContainer = document.getElementById('recent-projects');
 const projectsGrid = document.getElementById('projects-grid');
 
-const agentCards: Record<string, HTMLElement | null> = {
-  'Orchestrator': document.getElementById('agent-orchestrator'),
-  'Research': document.getElementById('agent-research'),
-  'UI/UX Designer': document.getElementById('agent-uiux'),
-  'Developer': document.getElementById('agent-dev'),
-  'Security': document.getElementById('agent-security'),
-  'QA Tester': document.getElementById('agent-qa'),
-  'Documentation': document.getElementById('agent-docs'),
-  'Refiner': document.getElementById('agent-refiner')
-};
-
 // Initialize Lucide icons
 declare const lucide: { createIcons: () => void };
 document.addEventListener('DOMContentLoaded', () => {
