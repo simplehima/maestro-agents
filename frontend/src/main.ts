@@ -804,3 +804,68 @@ openModelsFolderBtn?.addEventListener('click', async () => {
 });
 
 setTimeout(loadOllamaModelsPath, 1500);
+
+// === No-Cost Free API Management ===
+const nocostStatusDot = document.getElementById('nocost-status-dot');
+const nocostStatusText = document.getElementById('nocost-status-text');
+const refreshNocostBtn = document.getElementById('refresh-nocost-btn');
+const nocostModelList = document.getElementById('nocost-model-list');
+
+async function checkNocostStatus() {
+  if (!nocostStatusDot || !nocostStatusText) return;
+
+  nocostStatusText.textContent = 'Checking...';
+
+  try {
+    const response = await fetch(`${API_URL}/nocost/status`);
+    const data = await response.json();
+
+    if (data.online) {
+      nocostStatusDot.classList.add('online');
+      nocostStatusDot.classList.remove('offline');
+      nocostStatusText.textContent = 'Available';
+      loadNocostModels();
+    } else {
+      nocostStatusDot.classList.add('offline');
+      nocostStatusDot.classList.remove('online');
+      nocostStatusText.textContent = 'Not Available';
+      // Still show static models from config
+      loadNocostModels();
+    }
+  } catch (error) {
+    nocostStatusDot.classList.add('offline');
+    nocostStatusDot.classList.remove('online');
+    nocostStatusText.textContent = 'Error';
+    // Still try to load models from config fallback
+    loadNocostModels();
+  }
+}
+
+async function loadNocostModels() {
+  if (!nocostModelList) return;
+
+  try {
+    const response = await fetch(`${API_URL}/nocost/models`);
+    const data = await response.json();
+
+    if (data.success && data.models.length > 0) {
+      nocostModelList.innerHTML = data.models.map((m: any) => `
+        <div class="model-item">
+          <div class="model-info">
+            <span class="model-name">${m.name}</span>
+            ${m.size > 0 ? `<span class="model-size">${formatBytes(m.size)}</span>` : '<span class="model-size free-badge">Free</span>'}
+          </div>
+        </div>
+      `).join('');
+    } else {
+      nocostModelList.innerHTML = '<div class="empty-state">No free models available</div>';
+    }
+  } catch (error) {
+    nocostModelList.innerHTML = '<div class="empty-state">Failed to load free models</div>';
+  }
+}
+
+refreshNocostBtn?.addEventListener('click', checkNocostStatus);
+
+// Check no-cost API status on page load (after Ollama check)
+setTimeout(checkNocostStatus, 2000);

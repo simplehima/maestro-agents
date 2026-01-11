@@ -7,6 +7,7 @@ class ModelProvider(Enum):
     OLLAMA = "ollama"
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    NOCOST = "nocost"  # Free distributed API (no API key required)
 
 @dataclass
 class ModelConfig:
@@ -20,6 +21,9 @@ class ModelConfig:
 # Ollama API configuration
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/generate")
 OLLAMA_CHAT_URL = os.getenv("OLLAMA_CHAT_URL", "http://localhost:11434/api/chat")
+
+# No-Cost Free API configuration (ollamafreeapi)
+NOCOST_API_URL = os.getenv("NOCOST_API_URL", "https://api.ollamafreeapi.com")
 
 # Cloud API keys (optional fallback)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -84,6 +88,16 @@ MODEL_PRESETS = {
         "research": "gpt-4o",
         "security": "gpt-4o",
         "documentation": "gpt-4o-mini"
+    },
+    "free": {
+        "orchestrator": "llama3.3:70b",
+        "ui_ux": "llama3.3:70b",
+        "developer": "deepseek-coder:6.7b",
+        "qa": "llama3:8b",
+        "refiner": "llama3.3:70b",
+        "research": "llama3.3:70b",
+        "security": "mistral:7b",
+        "documentation": "llama3:8b"
     }
 }
 
@@ -135,19 +149,38 @@ CLOUD_CONFIGS = {
     "anthropic": {
         "base_url": "https://api.anthropic.com/v1/messages",
         "models": ["claude-3-5-sonnet-20241022", "claude-3-opus-20240229"]
+    },
+    "nocost": {
+        "base_url": NOCOST_API_URL,
+        "models": [
+            "llama3.3:70b", "llama3:8b", "llama3:70b",
+            "mistral:7b", "mixtral:8x7b",
+            "deepseek-coder:6.7b", "deepseek-r1:7b",
+            "codellama:7b", "codellama:13b",
+            "phi3:mini", "gemma:7b", "qwen:7b"
+        ]
     }
 }
 
 def is_cloud_model(model_name: str) -> bool:
-    """Check if a model name is a cloud model"""
+    """Check if a model name is a cloud/nocost model (not local Ollama)"""
     for provider, config in CLOUD_CONFIGS.items():
         if model_name in config["models"]:
             return True
     return False
 
+def is_nocost_model(model_name: str) -> bool:
+    """Check if a model name is from the free no-cost API"""
+    return model_name in CLOUD_CONFIGS.get("nocost", {}).get("models", [])
+
 def get_provider_for_model(model_name: str) -> ModelProvider:
     """Get the provider for a given model name"""
     for provider, config in CLOUD_CONFIGS.items():
         if model_name in config["models"]:
-            return ModelProvider.OPENAI if provider == "openai" else ModelProvider.ANTHROPIC
+            if provider == "openai":
+                return ModelProvider.OPENAI
+            elif provider == "anthropic":
+                return ModelProvider.ANTHROPIC
+            elif provider == "nocost":
+                return ModelProvider.NOCOST
     return ModelProvider.OLLAMA

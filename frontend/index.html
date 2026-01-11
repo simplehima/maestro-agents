@@ -95,6 +95,7 @@
               <option value="standard">Standard (13B-70B)</option>
               <option value="advanced">Advanced (33B-70B)</option>
               <option value="cloud">Cloud (GPT-4, Claude)</option>
+              <option value="free">Free API (No Cost)</option>
             </select>
           </div>
         </header>
@@ -345,7 +346,25 @@
                 <option value="standard">Standard</option>
                 <option value="advanced">Advanced</option>
                 <option value="cloud">Cloud APIs</option>
+                <option value="free">Free API (No Cost)</option>
               </select>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3><i data-lucide="zap" style="width:18px;height:18px;margin-right:8px;"></i>Free API (No Cost)</h3>
+            <p class="settings-description">Access free AI models without API keys via the distributed ollamafreeapi.</p>
+            <div class="ollama-status-row">
+              <div class="ollama-status">
+                <span class="status-dot" id="nocost-status-dot"></span>
+                <span id="nocost-status-text">Checking...</span>
+              </div>
+              <button id="refresh-nocost-btn" class="icon-btn" title="Refresh">
+                <i data-lucide="refresh-cw"></i>
+              </button>
+            </div>
+            <div id="nocost-model-list" class="model-list">
+              <div class="empty-state">Loading free models...</div>
             </div>
           </div>
 

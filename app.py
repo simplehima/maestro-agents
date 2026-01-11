@@ -35,7 +35,7 @@ from config import (
     OLLAMA_API_URL, OLLAMA_CHAT_URL, DEFAULT_MODEL, 
     get_model_for_role, get_available_models, set_model_preset,
     is_cloud_model, get_provider_for_model, ModelProvider,
-    OPENAI_API_KEY, ANTHROPIC_API_KEY, CLOUD_CONFIGS
+    OPENAI_API_KEY, ANTHROPIC_API_KEY, CLOUD_CONFIGS, NOCOST_API_URL
 )
 from project_manager import project_manager, Project
 from memory_store import MemoryStore
@@ -129,6 +129,8 @@ async def call_cloud_llm(model: str, prompt: str, system_prompt: str = "") -> st
         return await call_openai(model, prompt, system_prompt)
     elif provider == ModelProvider.ANTHROPIC:
         return await call_anthropic(model, prompt, system_prompt)
+    elif provider == ModelProvider.NOCOST:
+        return await call_nocost_api(model, prompt, system_prompt)
     return "Error: Unknown cloud provider"
 
 async def call_openai(model: str, prompt: str, system_prompt: str = "") -> str:
@@ -170,6 +172,25 @@ async def call_anthropic(model: str, prompt: str, system_prompt: str = "") -> st
             return response.json()["content"][0]["text"]
         except Exception as e:
             return f"Error: {str(e)}"
+
+async def call_nocost_api(model: str, prompt: str, system_prompt: str = "") -> str:
+    """Call the free no-cost API using ollamafreeapi library"""
+    import asyncio
+    
+    full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
+    
+    def sync_call():
+        try:
+            from ollamafreeapi import OllamaFreeAPI
+            api = OllamaFreeAPI()
+            response = api.chat(model_name=model, prompt=full_prompt, temperature=0.7)
+            return response
+        except Exception as e:
+            return f"Error calling free API: {str(e)}"
+    
+    # Run the synchronous API call in a thread pool
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, sync_call)
 
 # WebSocket endpoint
 @app.websocket("/ws")
@@ -448,6 +469,57 @@ async def open_ollama_models_folder():
             subprocess.Popen(['xdg-open', models_path])
             return {"success": True}
     return {"success": False, "error": "Models folder not found"}
+
+# No-Cost Free API Endpoints
+@app.get("/nocost/status")
+async def get_nocost_status():
+    """Check if the no-cost free API is available"""
+    import asyncio
+    
+    def check_status():
+        try:
+            from ollamafreeapi import OllamaFreeAPI
+            api = OllamaFreeAPI()
+            models = api.list_models()
+            if models and len(models) > 0:
+                return {"online": True, "message": f"Free API is available ({len(models)} models)", "model_count": len(models)}
+            return {"online": False, "message": "No models available"}
+        except Exception as e:
+            return {"online": False, "message": f"Free API error: {str(e)}"}
+    
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, check_status)
+
+@app.get("/nocost/models")
+async def list_nocost_models():
+    """Get list of available models from the no-cost free API"""
+    import asyncio
+    
+    def get_models():
+        try:
+            from ollamafreeapi import OllamaFreeAPI
+            api = OllamaFreeAPI()
+            models = api.list_models()
+            # Deduplicate and limit to 20 models
+            unique_models = list(dict.fromkeys(models))[:20]
+            return {
+                "success": True,
+                "models": [{"name": m, "size": 0, "modified": ""} for m in unique_models],
+                "total_available": len(models)
+            }
+        except Exception as e:
+            # Fallback to static list from config
+            from config import CLOUD_CONFIGS
+            nocost_models = CLOUD_CONFIGS.get("nocost", {}).get("models", [])
+            return {
+                "success": True,
+                "models": [{"name": m, "size": 0, "modified": ""} for m in nocost_models],
+                "source": "config",
+                "error": str(e)
+            }
+    
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, get_models)
 
 # Orchestration Endpoints
 @app.post("/start")
