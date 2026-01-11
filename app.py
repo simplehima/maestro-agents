@@ -555,20 +555,66 @@ Output ONLY a JSON array of objects: [{"task": "...", "assignee": "UI/UX|Develop
         # Get context from other agents
         project_ctx = memory.get_project_context()
         
-        await log_to_gui(project_id, agent_name, f"Working on Task {idx + 1}: {task[:50]}...")
+        await log_to_gui(project_id, agent_name, f"Working on Task {idx + 1}: {task[:50]}...", status="running")
         agent_mem.think(f"Starting task: {task}")
         
         model = get_model_for_role(agent_name)
-        system_prompt = f"""You are a {agent_name}. Complete the task thoroughly.
+        
+        # Updated prompt to generate actual code files
+        code_instruction = """
+IMPORTANT: Generate ACTUAL CODE, not descriptions. Wrap each file in markers:
+<<<FILE: path/to/filename.ext>>>
+[actual code here]
+<<<END_FILE>>>
+
+For Android apps, generate Kotlin (.kt) and XML layout files.
+For iOS apps, generate Swift (.swift) files.
+For web apps, generate HTML, CSS, and JavaScript files.
+For Flutter apps, generate Dart (.dart) files.
+"""
+        
+        system_prompt = f"""You are a {agent_name} who writes PRODUCTION-READY CODE.
+{code_instruction}
 Project Context:
 {project_ctx}
 {guidance}"""
         
         result = await call_llm(model, task, system_prompt)
-        agent_mem.output(result[:500])
-        await log_to_gui(project_id, agent_name, f"Completed Task {idx + 1}", status="done")
+        
+        # Extract and write code files from response
+        files_written = await extract_and_write_files(result, project.output_dir, project_id, agent_name)
+        
+        agent_mem.output(f"Generated {files_written} code files")
+        await log_to_gui(project_id, agent_name, f"Completed Task {idx + 1} ({files_written} files)", status="complete")
         
         return (idx, result)
+    
+    async def extract_and_write_files(response: str, output_dir: Path, project_id: str, agent: str) -> int:
+        """Extract code files from agent response and write them to disk"""
+        import re
+        
+        # Pattern to match file blocks
+        pattern = r'<<<FILE:\s*([^>]+)>>>(.*?)<<<END_FILE>>>'
+        matches = re.findall(pattern, response, re.DOTALL)
+        
+        files_written = 0
+        for filepath, content in matches:
+            filepath = filepath.strip()
+            content = content.strip()
+            
+            # Create full path
+            full_path = output_dir / filepath
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            try:
+                with open(full_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                files_written += 1
+                await log_to_gui(project_id, agent, f"Created: {filepath}", status="file_created")
+            except Exception as e:
+                await log_to_gui(project_id, agent, f"Error writing {filepath}: {e}", status="error")
+        
+        return files_written
     
     # Run UI/UX and Dev tasks in parallel
     parallel_tasks = []

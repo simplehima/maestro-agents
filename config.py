@@ -65,6 +65,16 @@ MODEL_PRESETS = {
         "security": "llama3:latest",
         "documentation": "llama3:latest"
     },
+    "coding": {
+        "orchestrator": "llama3:latest",
+        "ui_ux": "deepseek-coder:6.7b",
+        "developer": "deepseek-coder:6.7b",
+        "qa": "llama3:latest",
+        "refiner": "llama3:latest",
+        "research": "llama3:latest",
+        "security": "codellama:7b",
+        "documentation": "llama3:latest"
+    },
     "cloud": {
         "orchestrator": "gpt-4o",
         "ui_ux": "gpt-4o",
