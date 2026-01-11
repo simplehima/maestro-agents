@@ -135,30 +135,129 @@ function getAgentIcon(agent: string): string {
   return icons[agent] || 'message-circle';
 }
 
-function updateAgentStatus(agent: string, text: string, _status?: string) {
-  Object.values(agentCards).forEach(card => card?.classList.remove('active'));
+// Agent mapping for LED IDs
+const agentToLedId: { [key: string]: string } = {
+  'Orchestrator': 'led-orchestrator',
+  'Research': 'led-research',
+  'UI/UX Designer': 'led-uiux',
+  'Developer': 'led-developer',
+  'Security': 'led-security',
+  'QA Tester': 'led-qa',
+  'Documentation': 'led-docs',
+  'Refiner': 'led-refiner'
+};
 
-  const card = agentCards[agent];
-  if (card) {
-    card.classList.add('active');
-    const statusEl = card.querySelector('.agent-status');
-    if (statusEl) {
-      statusEl.textContent = text.length > 25 ? text.substring(0, 22) + '...' : text;
-      statusEl.classList.add('active');
+function updateAgentStatus(agent: string, text: string, status?: string) {
+  // Update LED dashboard
+  const ledId = agentToLedId[agent];
+  if (ledId) {
+    const ledContainer = document.getElementById(ledId);
+    if (ledContainer) {
+      const led = ledContainer.querySelector('.led');
+      const actionText = ledContainer.querySelector('.led-action');
+
+      if (led) {
+        led.classList.remove('idle', 'active', 'waiting', 'error');
+        if (status === 'error') {
+          led.classList.add('error');
+        } else if (status === 'waiting') {
+          led.classList.add('waiting');
+        } else if (status === 'complete') {
+          led.classList.add('idle');
+        } else {
+          led.classList.add('active');
+        }
+      }
+
+      if (actionText) {
+        actionText.textContent = text.length > 20 ? text.substring(0, 18) + '...' : text;
+      }
     }
+  }
+
+  // Also refresh file list if file was created
+  if (text.toLowerCase().includes('created') || text.toLowerCase().includes('wrote')) {
+    setTimeout(loadProjectFiles, 500);
   }
 }
 
 function resetAgents() {
-  Object.entries(agentCards).forEach(([, card]) => {
-    card?.classList.remove('active');
-    const statusEl = card?.querySelector('.agent-status');
-    if (statusEl) {
-      statusEl.textContent = 'Idle';
-      statusEl.classList.remove('active');
-    }
+  document.querySelectorAll('.agent-led').forEach(led => {
+    const ledDot = led.querySelector('.led');
+    const actionText = led.querySelector('.led-action');
+    ledDot?.classList.remove('active', 'waiting', 'error');
+    ledDot?.classList.add('idle');
+    if (actionText) actionText.textContent = 'Idle';
   });
 }
+
+// === File Explorer ===
+const fileTree = document.getElementById('file-tree');
+const fileContent = document.getElementById('file-content');
+const currentFileName = document.getElementById('current-file-name');
+const refreshFilesBtn = document.getElementById('refresh-files-btn');
+const closeFileBtn = document.getElementById('close-file-btn');
+
+async function loadProjectFiles() {
+  if (!fileTree) return;
+
+  try {
+    const response = await fetch(`${API_URL}/files`);
+    const data = await response.json();
+
+    if (data.files && data.files.length > 0) {
+      fileTree.innerHTML = data.files.map((f: any) => `
+        <div class="file-item" data-path="${f.path}" title="${f.path}">
+          <i data-lucide="file-code"></i>
+          <span>${f.name}</span>
+        </div>
+      `).join('');
+
+      // Add click handlers
+      fileTree.querySelectorAll('.file-item').forEach(item => {
+        item.addEventListener('click', () => viewFile((item as HTMLElement).dataset.path || ''));
+      });
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    } else {
+      fileTree.innerHTML = '<div class="empty-state">No files yet...</div>';
+    }
+  } catch (error) {
+    fileTree.innerHTML = '<div class="empty-state">Could not load files</div>';
+  }
+}
+
+async function viewFile(path: string) {
+  if (!fileContent || !currentFileName) return;
+
+  try {
+    const response = await fetch(`${API_URL}/files/${encodeURIComponent(path)}`);
+    const data = await response.json();
+
+    if (data.content) {
+      currentFileName.textContent = path.split(/[\\/]/).pop() || path;
+      fileContent.innerHTML = `<code>${escapeHtml(data.content)}</code>`;
+      closeFileBtn?.classList.remove('hidden');
+    } else {
+      fileContent.innerHTML = `<code>Error: ${data.error}</code>`;
+    }
+  } catch (error) {
+    fileContent.innerHTML = `<code>Error loading file</code>`;
+  }
+}
+
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+refreshFilesBtn?.addEventListener('click', loadProjectFiles);
+closeFileBtn?.addEventListener('click', () => {
+  if (currentFileName) currentFileName.textContent = 'No file selected';
+  if (fileContent) fileContent.innerHTML = '<code>Select a file to view its contents...</code>';
+  closeFileBtn?.classList.add('hidden');
+});
 
 // === Project Management ===
 async function loadProjects() {

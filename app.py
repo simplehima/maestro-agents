@@ -260,6 +260,53 @@ async def delete_project(path: str):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+@app.get("/files")
+async def list_project_files():
+    """List all files in current project"""
+    if not project_manager.current_project:
+        return {"files": [], "error": "No project open"}
+    
+    try:
+        files = []
+        project_path = project_manager.current_project.path
+        output_dir = project_path / "output"
+        
+        if output_dir.exists():
+            for item in output_dir.rglob("*"):
+                if item.is_file():
+                    rel_path = item.relative_to(project_path)
+                    files.append({
+                        "name": item.name,
+                        "path": str(rel_path),
+                        "full_path": str(item),
+                        "size": item.stat().st_size,
+                        "ext": item.suffix
+                    })
+        
+        return {"files": files, "project": project_manager.current_project.name}
+    except Exception as e:
+        return {"files": [], "error": str(e)}
+
+@app.get("/files/{file_path:path}")
+async def get_file_content(file_path: str):
+    """Get content of a specific file"""
+    if not project_manager.current_project:
+        return {"content": "", "error": "No project open"}
+    
+    try:
+        full_path = project_manager.current_project.path / file_path
+        if full_path.exists() and full_path.is_file():
+            # Check file size (limit to 500KB for preview)
+            if full_path.stat().st_size > 500000:
+                return {"content": "File too large to preview", "truncated": True}
+            
+            with open(full_path, 'r', encoding='utf-8', errors='replace') as f:
+                content = f.read()
+            return {"content": content, "path": file_path}
+        return {"content": "", "error": "File not found"}
+    except Exception as e:
+        return {"content": "", "error": str(e)}
+
 @app.get("/logs/{agent}")
 async def get_agent_logs(agent: str):
     try:
