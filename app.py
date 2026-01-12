@@ -665,16 +665,16 @@ Project Context:
         """Extract code files from agent response and write them to disk"""
         import re
         
-        # Pattern to match file blocks
+        files_written = 0
+        
+        # Method 1: Look for explicit FILE markers
         pattern = r'<<<FILE:\s*([^>]+)>>>(.*?)<<<END_FILE>>>'
         matches = re.findall(pattern, response, re.DOTALL)
         
-        files_written = 0
         for filepath, content in matches:
             filepath = filepath.strip()
             content = content.strip()
             
-            # Create full path
             full_path = output_dir / filepath
             full_path.parent.mkdir(parents=True, exist_ok=True)
             
@@ -685,6 +685,59 @@ Project Context:
                 await log_to_gui(project_id, agent, f"Created: {filepath}", status="file_created")
             except Exception as e:
                 await log_to_gui(project_id, agent, f"Error writing {filepath}: {e}", status="error")
+        
+        # Method 2: Fallback - extract from markdown code blocks if no FILE markers found
+        if files_written == 0:
+            lang_ext_map = {
+                'kotlin': '.kt', 'kt': '.kt',
+                'java': '.java',
+                'swift': '.swift',
+                'dart': '.dart',
+                'python': '.py', 'py': '.py',
+                'javascript': '.js', 'js': '.js',
+                'typescript': '.ts', 'ts': '.ts',
+                'xml': '.xml',
+                'html': '.html',
+                'css': '.css',
+                'json': '.json',
+                'yaml': '.yaml', 'yml': '.yml',
+                'gradle': '.gradle',
+            }
+            
+            # Find all code blocks with language
+            code_pattern = r'```(\w+)\n(.*?)```'
+            code_matches = re.findall(code_pattern, response, re.DOTALL)
+            
+            for i, (lang, code) in enumerate(code_matches):
+                lang_lower = lang.lower()
+                if lang_lower in lang_ext_map:
+                    ext = lang_ext_map[lang_lower]
+                    # Generate filename from code or use counter
+                    if lang_lower in ['kotlin', 'kt', 'java', 'swift']:
+                        # Try to extract class/file name from code
+                        class_match = re.search(r'class\s+(\w+)', code)
+                        if class_match:
+                            filename = f"{class_match.group(1)}{ext}"
+                        else:
+                            filename = f"file_{i+1}{ext}"
+                    elif lang_lower == 'xml':
+                        if 'layout' in code.lower() or 'LinearLayout' in code or 'ConstraintLayout' in code:
+                            filename = f"layout_main_{i+1}.xml"
+                        else:
+                            filename = f"resource_{i+1}.xml"
+                    else:
+                        filename = f"file_{i+1}{ext}"
+                    
+                    full_path = output_dir / "src" / filename
+                    full_path.parent.mkdir(parents=True, exist_ok=True)
+                    
+                    try:
+                        with open(full_path, 'w', encoding='utf-8') as f:
+                            f.write(code.strip())
+                        files_written += 1
+                        await log_to_gui(project_id, agent, f"Created: src/{filename}", status="file_created")
+                    except Exception as e:
+                        await log_to_gui(project_id, agent, f"Error writing {filename}: {e}", status="error")
         
         return files_written
     
