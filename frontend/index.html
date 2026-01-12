@@ -161,46 +161,94 @@
         <!-- Agent Status Bar (LED Dashboard) -->
         <div class="agent-status-bar">
           <h2 class="section-title">Agent Status</h2>
-          <div class="agent-led-row">
-            <div class="agent-led" id="led-orchestrator" data-agent="Orchestrator">
-              <span class="led idle"></span>
-              <span class="led-label">Orchestrator</span>
-              <span class="led-action">Idle</span>
+          <div class="agent-status-grid">
+            <div class="agent-status-card" id="led-orchestrator" data-agent="Orchestrator">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">Orchestrator</span>
+                <span class="agent-model-badge">llama3</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-research" data-agent="Research">
-              <span class="led idle"></span>
-              <span class="led-label">Research</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-research" data-agent="Research">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">Research</span>
+                <span class="agent-model-badge">llama3</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-uiux" data-agent="UI/UX Designer">
-              <span class="led idle"></span>
-              <span class="led-label">UI/UX</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-uiux" data-agent="UI/UX Designer">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">UI/UX</span>
+                <span class="agent-model-badge">deepseek</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-developer" data-agent="Developer">
-              <span class="led idle"></span>
-              <span class="led-label">Developer</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-developer" data-agent="Developer">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">Developer</span>
+                <span class="agent-model-badge">deepseek</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-security" data-agent="Security">
-              <span class="led idle"></span>
-              <span class="led-label">Security</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-security" data-agent="Security">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">Security</span>
+                <span class="agent-model-badge">codellama</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-qa" data-agent="QA Tester">
-              <span class="led idle"></span>
-              <span class="led-label">QA</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-qa" data-agent="QA Tester">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">QA</span>
+                <span class="agent-model-badge">llama3</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-docs" data-agent="Documentation">
-              <span class="led idle"></span>
-              <span class="led-label">Docs</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-docs" data-agent="Documentation">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">Docs</span>
+                <span class="agent-model-badge">llama3</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
-            <div class="agent-led" id="led-refiner" data-agent="Refiner">
-              <span class="led idle"></span>
-              <span class="led-label">Refiner</span>
-              <span class="led-action">Idle</span>
+            <div class="agent-status-card" id="led-refiner" data-agent="Refiner">
+              <div class="agent-card-header">
+                <span class="led idle"></span>
+                <span class="agent-name">Refiner</span>
+                <span class="agent-model-badge">llama3</span>
+              </div>
+              <div class="agent-task">Idle</div>
+              <div class="agent-progress-bar">
+                <div class="agent-progress-fill"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -342,18 +390,19 @@
             <div class="setting-item">
               <label>Default Preset</label>
               <select id="default-preset">
-                <option value="basic">Basic</option>
+                <option value="basic">Basic (llama3)</option>
                 <option value="standard">Standard</option>
                 <option value="advanced">Advanced</option>
+                <option value="coding">Coding (deepseek-coder)</option>
                 <option value="cloud">Cloud APIs</option>
-                <option value="free">Free API (No Cost)</option>
               </select>
             </div>
           </div>
 
           <div class="settings-group">
             <h3><i data-lucide="zap" style="width:18px;height:18px;margin-right:8px;"></i>Free API (No Cost)</h3>
-            <p class="settings-description">Access free AI models without API keys via the distributed ollamafreeapi.</p>
+            <p class="settings-description">Access free AI models without API keys via the distributed ollamafreeapi.
+            </p>
             <div class="ollama-status-row">
               <div class="ollama-status">
                 <span class="status-dot" id="nocost-status-dot"></span>

@@ -143,8 +143,9 @@ function updateAgentStatus(agent: string, text: string, status?: string) {
     const ledContainer = document.getElementById(ledId);
     if (ledContainer) {
       const led = ledContainer.querySelector('.led');
-      const actionText = ledContainer.querySelector('.led-action');
+      const taskText = ledContainer.querySelector('.agent-task');
 
+      // Update LED status
       if (led) {
         led.classList.remove('idle', 'active', 'waiting', 'error');
         if (status === 'error') {
@@ -153,13 +154,16 @@ function updateAgentStatus(agent: string, text: string, status?: string) {
           led.classList.add('waiting');
         } else if (status === 'complete') {
           led.classList.add('idle');
+          ledContainer.classList.remove('active');
         } else {
           led.classList.add('active');
+          ledContainer.classList.add('active');
         }
       }
 
-      if (actionText) {
-        actionText.textContent = text.length > 20 ? text.substring(0, 18) + '...' : text;
+      // Update task text
+      if (taskText) {
+        taskText.textContent = text.length > 50 ? text.substring(0, 48) + '...' : text;
       }
     }
   }
@@ -171,12 +175,13 @@ function updateAgentStatus(agent: string, text: string, status?: string) {
 }
 
 function resetAgents() {
-  document.querySelectorAll('.agent-led').forEach(led => {
-    const ledDot = led.querySelector('.led');
-    const actionText = led.querySelector('.led-action');
+  document.querySelectorAll('.agent-status-card').forEach(card => {
+    const ledDot = card.querySelector('.led');
+    const taskText = card.querySelector('.agent-task');
     ledDot?.classList.remove('active', 'waiting', 'error');
     ledDot?.classList.add('idle');
-    if (actionText) actionText.textContent = 'Idle';
+    card.classList.remove('active');
+    if (taskText) taskText.textContent = 'Idle';
   });
 }
 

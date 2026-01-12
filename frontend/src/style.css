@@ -1484,6 +1484,103 @@ body {
     max-width: 100px;
 }
 
+/* ===== AGENT STATUS CARDS ===== */
+.agent-status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.agent-status-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.agent-status-card.active {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+}
+
+.agent-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.agent-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.agent-model-badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-sm);
+    color: var(--accent-primary);
+}
+
+.agent-task {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    min-height: 32px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.agent-progress-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.agent-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    transition: width 0.3s ease;
+}
+
+.agent-status-card.active .agent-progress-fill {
+    width: 100%;
+    animation: progress-pulse 2s ease-in-out infinite;
+}
+
+@keyframes progress-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@media (max-width: 1200px) {
+    .agent-status-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .agent-status-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ===== LIVE PANEL GRID ===== */
 .live-panel-grid {
     display: grid;
