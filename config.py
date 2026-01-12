@@ -118,12 +118,12 @@ def get_temperature_for_role(role: str) -> float:
     role_key = role.lower().replace(" ", "_").replace("/", "")
     return AGENT_TEMPERATURES.get(role_key, 0.7)
 
-# Current active preset
-CURRENT_PRESET = os.getenv("MODEL_PRESET", "basic")
+# Current active preset (mutable at runtime)
+current_preset = os.getenv("MODEL_PRESET", "basic")
 
 def get_model_for_role(role: str) -> str:
     """Get the configured model for a specific agent role"""
-    preset = MODEL_PRESETS.get(CURRENT_PRESET, MODEL_PRESETS["basic"])
+    preset = MODEL_PRESETS.get(current_preset, MODEL_PRESETS["basic"])
     role_key = role.lower().replace(" ", "_").replace("/", "")
     return preset.get(role_key, DEFAULT_MODEL)
 
@@ -133,9 +133,9 @@ def get_available_models() -> Dict[str, list]:
 
 def set_model_preset(preset_name: str):
     """Set the active model preset"""
-    global CURRENT_PRESET
+    global current_preset
     if preset_name in MODEL_PRESETS:
-        CURRENT_PRESET = preset_name
+        current_preset = preset_name
         os.environ["MODEL_PRESET"] = preset_name
         return True
     return False

@@ -281,6 +281,111 @@ async def delete_project(path: str):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+# === System Information ===
+@app.get("/system/hardware")
+async def get_hardware_info():
+    """Detect system hardware and provide model recommendations"""
+    import platform
+    
+    try:
+        # Get RAM info
+        if sys.platform == 'win32':
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            c_ulong = ctypes.c_ulong
+            class MEMORYSTATUS(ctypes.Structure):
+                _fields_ = [
+                    ('dwLength', c_ulong),
+                    ('dwMemoryLoad', c_ulong),
+                    ('dwTotalPhys', c_ulong),
+                    ('dwAvailPhys', c_ulong),
+                    ('dwTotalPageFile', c_ulong),
+                    ('dwAvailPageFile', c_ulong),
+                    ('dwTotalVirtual', c_ulong),
+                    ('dwAvailVirtual', c_ulong)
+                ]
+            memstatus = MEMORYSTATUS()
+            memstatus.dwLength = ctypes.sizeof(MEMORYSTATUS)
+            kernel32.GlobalMemoryStatus(ctypes.byref(memstatus))
+            total_ram_gb = memstatus.dwTotalPhys // (1024 ** 3)
+        else:
+            import os
+            mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+            total_ram_gb = mem_bytes // (1024 ** 3)
+        
+        cpu_info = platform.processor()
+        cpu_cores = os.cpu_count() or 4
+        
+        # Generate recommendations based on RAM
+        recommendations = []
+        if total_ram_gb >= 64:
+            recommendations = [
+                {"model": "llama3:70b", "reason": "Best reasoning (40GB)", "priority": "high"},
+                {"model": "deepseek-coder:33b", "reason": "Best code generation (19GB)", "priority": "high"},
+                {"model": "codellama:34b", "reason": "Enterprise code (19GB)", "priority": "medium"},
+                {"model": "qwen2.5-coder:32b", "reason": "Excellent coder (18GB)", "priority": "medium"}
+            ]
+            advice = "Your system can run the largest models. Recommended: Use 'coding' preset with deepseek-coder:33b"
+        elif total_ram_gb >= 32:
+            recommendations = [
+                {"model": "deepseek-coder:33b", "reason": "Best code generation (19GB)", "priority": "high"},
+                {"model": "codellama:13b", "reason": "Good balance (7GB)", "priority": "high"},
+                {"model": "llama3:latest", "reason": "General purpose (4.7GB)", "priority": "medium"}
+            ]
+            advice = "Good RAM for coding models. Recommended: deepseek-coder:33b or codellama:13b"
+        elif total_ram_gb >= 16:
+            recommendations = [
+                {"model": "deepseek-coder:6.7b", "reason": "Fast coder (4GB)", "priority": "high"},
+                {"model": "codellama:7b", "reason": "Compact coder (4GB)", "priority": "high"},
+                {"model": "llama3:latest", "reason": "General purpose (4.7GB)", "priority": "medium"}
+            ]
+            advice = "Good for medium models. Recommended: deepseek-coder:6.7b"
+        else:
+            recommendations = [
+                {"model": "llama3:latest", "reason": "General purpose (4.7GB)", "priority": "high"},
+                {"model": "codellama:7b", "reason": "Compact coder (4GB)", "priority": "medium"}
+            ]
+            advice = "Limited RAM. Stick with 7B models for best performance"
+        
+        return {
+            "ram_gb": total_ram_gb,
+            "cpu": cpu_info,
+            "cpu_cores": cpu_cores,
+            "platform": sys.platform,
+            "recommendations": recommendations,
+            "advice": advice
+        }
+    except Exception as e:
+        return {"error": str(e), "ram_gb": 8, "recommendations": []}
+
+# === Preset Management ===
+@app.get("/presets")
+async def get_all_presets():
+    """Get all model presets and current selection"""
+    from config import MODEL_PRESETS, current_preset
+    return {
+        "presets": MODEL_PRESETS,
+        "current": current_preset,
+        "roles": ["orchestrator", "ui_ux", "developer", "qa", "refiner", "research", "security", "documentation"]
+    }
+
+@app.get("/presets/{name}")
+async def get_preset(name: str):
+    """Get a specific preset configuration"""
+    from config import MODEL_PRESETS
+    if name in MODEL_PRESETS:
+        return {"name": name, "config": MODEL_PRESETS[name]}
+    return {"error": "Preset not found"}
+
+@app.post("/presets/select/{name}")
+async def select_preset(name: str):
+    """Select a preset as active"""
+    try:
+        set_model_preset(name)
+        return {"success": True, "preset": name}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 @app.get("/files")
 async def list_project_files():
     """List all files in current project"""

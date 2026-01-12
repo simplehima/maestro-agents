@@ -497,6 +497,59 @@
         </div>
       </div>
     </div>
+
+    <!-- Agent Detail Modal -->
+    <div id="agent-detail-modal" class="modal hidden">
+      <div class="modal-content agent-detail-content">
+        <div class="modal-header">
+          <h2><span id="agent-detail-name">Agent Name</span></h2>
+          <button id="close-agent-modal" class="icon-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="agent-detail-grid">
+            <div class="detail-section">
+              <h4><i data-lucide="cpu"></i> Model</h4>
+              <p id="agent-detail-model">llama3:latest</p>
+            </div>
+            <div class="detail-section">
+              <h4><i data-lucide="activity"></i> Status</h4>
+              <p id="agent-detail-status">Idle</p>
+            </div>
+            <div class="detail-section full-width">
+              <h4><i data-lucide="clipboard-list"></i> Current Task</h4>
+              <p id="agent-detail-task">No active task</p>
+            </div>
+            <div class="detail-section full-width">
+              <h4><i data-lucide="file-text"></i> Recent Output</h4>
+              <pre id="agent-detail-output" class="output-preview">No output yet...</pre>
+            </div>
+            <div class="detail-section">
+              <h4><i data-lucide="file-plus"></i> Files Created</h4>
+              <ul id="agent-detail-files" class="file-list">
+                <li>None</li>
+              </ul>
+            </div>
+            <div class="detail-section">
+              <h4><i data-lucide="clock"></i> Metrics</h4>
+              <p>Tokens: <span id="agent-detail-tokens">0</span></p>
+              <p>Latency: <span id="agent-detail-latency">-</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardware Recommendation Banner (shown on Settings page) -->
+    <div id="hardware-banner" class="hardware-banner hidden">
+      <div class="hardware-info">
+        <i data-lucide="cpu"></i>
+        <span><strong id="hw-ram">64GB</strong> RAM • <strong id="hw-cores">16</strong> cores</span>
+      </div>
+      <div class="hardware-advice" id="hw-advice">
+        Your system can run the largest models
+      </div>
+      <div class="hardware-recommendations" id="hw-recommendations"></div>
+    </div>
   </div>
 
   <script type="module" src="./src/main.ts"></script>

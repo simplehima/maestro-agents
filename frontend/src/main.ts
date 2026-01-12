@@ -168,6 +168,9 @@ function updateAgentStatus(agent: string, text: string, status?: string) {
     }
   }
 
+  // Update agent state for popup
+  updateAgentState(agent, text, status || 'active');
+
   // Also refresh file list if file was created
   if (text.toLowerCase().includes('created') || text.toLowerCase().includes('wrote')) {
     setTimeout(loadProjectFiles, 500);
@@ -874,3 +877,100 @@ refreshNocostBtn?.addEventListener('click', checkNocostStatus);
 
 // Check no-cost API status on page load (after Ollama check)
 setTimeout(checkNocostStatus, 2000);
+
+// === Agent Detail Popup ===
+const agentDetailModal = document.getElementById('agent-detail-modal');
+const closeAgentModal = document.getElementById('close-agent-modal');
+
+// Store agent state for popups
+const agentState: { [key: string]: { task: string; output: string; files: string[]; model: string; status: string } } = {};
+
+// Add click handlers to agent cards
+document.querySelectorAll('.agent-status-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const agentName = card.getAttribute('data-agent') || 'Unknown';
+    showAgentDetail(agentName);
+  });
+});
+
+function showAgentDetail(agentName: string) {
+  if (!agentDetailModal) return;
+
+  const state = agentState[agentName] || { task: 'No active task', output: 'No output yet...', files: [], model: 'llama3:latest', status: 'Idle' };
+
+  const nameEl = document.getElementById('agent-detail-name');
+  const modelEl = document.getElementById('agent-detail-model');
+  const statusEl = document.getElementById('agent-detail-status');
+  const taskEl = document.getElementById('agent-detail-task');
+  const outputEl = document.getElementById('agent-detail-output');
+  const filesEl = document.getElementById('agent-detail-files');
+
+  if (nameEl) nameEl.textContent = agentName;
+  if (modelEl) modelEl.textContent = state.model;
+  if (statusEl) statusEl.textContent = state.status;
+  if (taskEl) taskEl.textContent = state.task;
+  if (outputEl) outputEl.textContent = state.output;
+  if (filesEl) filesEl.innerHTML = state.files.length > 0
+    ? state.files.map(f => `<li>${f}</li>`).join('')
+    : '<li>None</li>';
+
+  agentDetailModal.classList.remove('hidden');
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+closeAgentModal?.addEventListener('click', () => {
+  agentDetailModal?.classList.add('hidden');
+});
+
+agentDetailModal?.addEventListener('click', (e) => {
+  if (e.target === agentDetailModal) agentDetailModal.classList.add('hidden');
+});
+
+// Update agent state when status changes (called from updateAgentStatus)
+function updateAgentState(agent: string, task: string, status: string) {
+  if (!agentState[agent]) {
+    agentState[agent] = { task: '', output: '', files: [], model: 'llama3:latest', status: 'Idle' };
+  }
+  agentState[agent].task = task;
+  agentState[agent].status = status;
+}
+
+// === Hardware Detection ===
+async function loadHardwareInfo() {
+  try {
+    const response = await fetch(`${API_URL}/system/hardware`);
+    const data = await response.json();
+
+    const ramEl = document.getElementById('hw-ram');
+    const coresEl = document.getElementById('hw-cores');
+    const adviceEl = document.getElementById('hw-advice');
+    const recsEl = document.getElementById('hw-recommendations');
+    const banner = document.getElementById('hardware-banner');
+
+    if (ramEl) ramEl.textContent = `${data.ram_gb}GB`;
+    if (coresEl) coresEl.textContent = data.cpu_cores;
+    if (adviceEl) adviceEl.textContent = data.advice || 'Check hardware recommendations';
+
+    if (recsEl && data.recommendations) {
+      recsEl.innerHTML = data.recommendations.map((r: any) =>
+        `<span class="hw-rec-badge ${r.priority}">${r.model}</span>`
+      ).join('');
+    }
+
+    // Show banner on settings page
+    banner?.classList.remove('hidden');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  } catch (error) {
+    console.log('Could not load hardware info');
+  }
+}
+
+// Load hardware info when settings page opens
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const page = btn.getAttribute('data-page');
+    if (page === 'settings') {
+      loadHardwareInfo();
+    }
+  });
+});
