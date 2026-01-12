@@ -276,11 +276,40 @@
           </div>
         </div>
 
+        <!-- Integrated Terminal -->
+        <div class="terminal-section">
+          <div class="section-header">
+            <h2 class="section-title"><i data-lucide="terminal"></i> Terminal</h2>
+            <div class="terminal-controls">
+              <button id="run-project-btn" class="secondary-btn"><i data-lucide="play"></i> Run</button>
+              <button id="clear-terminal-btn" class="icon-btn"><i data-lucide="trash-2"></i></button>
+            </div>
+          </div>
+          <div id="terminal-container" class="terminal-container">
+            <div class="terminal-output" id="terminal-output">
+              <div class="terminal-line">$ Ready to run commands...</div>
+            </div>
+            <div class="terminal-input-row">
+              <span class="terminal-prompt">$</span>
+              <input type="text" id="terminal-input" class="terminal-input" placeholder="Enter command...">
+            </div>
+          </div>
+        </div>
+
         <!-- Activity Feed -->
         <div class="activity-section">
           <div class="section-header">
             <h2 class="section-title">Activity Feed</h2>
-            <button id="clear-feed" class="icon-btn"><i data-lucide="trash-2"></i></button>
+            <div class="log-controls">
+              <div class="view-toggle">
+                <button id="view-single" class="view-btn active" title="Single View"><i data-lucide="list"></i></button>
+                <button id="view-split" class="view-btn" title="Split View (2 Agents)"><i
+                    data-lucide="columns-2"></i></button>
+                <button id="view-quad" class="view-btn" title="Quad View (4 Agents)"><i
+                    data-lucide="grid-2x2"></i></button>
+              </div>
+              <button id="clear-feed" class="icon-btn"><i data-lucide="trash-2"></i></button>
+            </div>
           </div>
           <div id="logs-container" class="logs-container">
             <div class="log-entry system">

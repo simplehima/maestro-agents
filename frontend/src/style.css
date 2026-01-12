@@ -1821,3 +1821,137 @@ body {
     transform: translateY(-2px);
     border-color: var(--accent-primary);
 }
+
+/* ===== INTEGRATED TERMINAL ===== */
+.terminal-section {
+    margin-bottom: 1.5rem;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-container {
+    background: #0d1117;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    overflow: hidden;
+}
+
+.terminal-output {
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.terminal-line {
+    color: #c9d1d9;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.terminal-line.error {
+    color: #f85149;
+}
+
+.terminal-line.success {
+    color: #3fb950;
+}
+
+.terminal-input-row {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid var(--border-color);
+}
+
+.terminal-prompt {
+    color: #3fb950;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #c9d1d9;
+    font-family: inherit;
+    font-size: 0.8rem;
+    outline: none;
+}
+
+/* ===== LOG VIEW TOGGLE ===== */
+.log-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.view-toggle {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.view-btn {
+    padding: 0.4rem 0.6rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+    color: var(--text-primary);
+}
+
+.view-btn.active {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.view-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Multi-view logs container */
+.logs-container.split-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.logs-container.quad-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0.5rem;
+    max-height: 500px;
+}
+
+.log-column {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.log-column-header {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}

@@ -974,3 +974,91 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     }
   });
 });
+
+// === Integrated Terminal ===
+const terminalInput = document.getElementById('terminal-input') as HTMLInputElement;
+const terminalOutput = document.getElementById('terminal-output');
+const runProjectBtn = document.getElementById('run-project-btn');
+const clearTerminalBtn = document.getElementById('clear-terminal-btn');
+
+function addTerminalLine(text: string, type: 'normal' | 'error' | 'success' = 'normal') {
+  if (!terminalOutput) return;
+  const line = document.createElement('div');
+  line.className = `terminal-line ${type}`;
+  line.textContent = text;
+  terminalOutput.appendChild(line);
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+async function runTerminalCommand(command: string) {
+  addTerminalLine(`$ ${command}`);
+
+  try {
+    const response = await fetch(`${API_URL}/terminal/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command })
+    });
+    const data = await response.json();
+
+    if (data.output) {
+      const lines = data.output.split('\n');
+      lines.forEach((line: string) => {
+        addTerminalLine(line, data.success ? 'normal' : 'error');
+      });
+    }
+
+    if (data.success) {
+      addTerminalLine(`✓ Command completed`, 'success');
+    } else {
+      addTerminalLine(`✗ Exit code: ${data.returncode}`, 'error');
+    }
+  } catch (error) {
+    addTerminalLine(`Error: ${error}`, 'error');
+  }
+}
+
+terminalInput?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && terminalInput.value.trim()) {
+    runTerminalCommand(terminalInput.value.trim());
+    terminalInput.value = '';
+  }
+});
+
+runProjectBtn?.addEventListener('click', async () => {
+  addTerminalLine('🚀 Attempting to run project...');
+  runTerminalCommand('dir /b');  // Show files first
+});
+
+clearTerminalBtn?.addEventListener('click', () => {
+  if (terminalOutput) {
+    terminalOutput.innerHTML = '<div class="terminal-line">$ Ready to run commands...</div>';
+  }
+});
+
+// === Log View Toggle ===
+const viewSingleBtn = document.getElementById('view-single');
+const viewSplitBtn = document.getElementById('view-split');
+const viewQuadBtn = document.getElementById('view-quad');
+
+function setLogView(view: 'single' | 'split' | 'quad') {
+  // Update buttons
+  document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+
+  if (view === 'single') {
+    viewSingleBtn?.classList.add('active');
+    logsContainer?.classList.remove('split-view', 'quad-view');
+  } else if (view === 'split') {
+    viewSplitBtn?.classList.add('active');
+    logsContainer?.classList.remove('quad-view');
+    logsContainer?.classList.add('split-view');
+  } else if (view === 'quad') {
+    viewQuadBtn?.classList.add('active');
+    logsContainer?.classList.remove('split-view');
+    logsContainer?.classList.add('quad-view');
+  }
+}
+
+viewSingleBtn?.addEventListener('click', () => setLogView('single'));
+viewSplitBtn?.addEventListener('click', () => setLogView('split'));
+viewQuadBtn?.addEventListener('click', () => setLogView('quad'));

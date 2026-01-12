@@ -433,6 +433,46 @@ async def get_file_content(file_path: str):
     except Exception as e:
         return {"content": "", "error": str(e)}
 
+# === Terminal Execution ===
+class TerminalRequest(BaseModel):
+    command: str
+
+@app.post("/terminal/run")
+async def run_terminal_command(req: TerminalRequest):
+    """Execute a command in the project directory"""
+    import subprocess
+    
+    try:
+        # Get working directory
+        if project_manager.current_project:
+            cwd = project_manager.current_project.path / "output"
+            if not cwd.exists():
+                cwd = project_manager.current_project.path
+        else:
+            cwd = Path.cwd()
+        
+        # Run command safely
+        result = subprocess.run(
+            req.command,
+            shell=True,
+            cwd=str(cwd),
+            capture_output=True,
+            text=True,
+            timeout=60  # 60 second timeout
+        )
+        
+        output = result.stdout + result.stderr
+        return {
+            "success": result.returncode == 0,
+            "output": output,
+            "returncode": result.returncode,
+            "cwd": str(cwd)
+        }
+    except subprocess.TimeoutExpired:
+        return {"success": False, "output": "Command timed out after 60 seconds", "returncode": -1}
+    except Exception as e:
+        return {"success": False, "output": str(e), "returncode": -1}
+
 @app.get("/logs/{agent}")
 async def get_agent_logs(agent: str):
     try:
