@@ -1,7 +1,7 @@
 """
 Database Module
 ===============
-SQLite-based persistence for Maestro V2.
+SQLite-based persistence for Maestro V3.
 """
 
 import sqlite3

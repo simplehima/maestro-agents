@@ -1,5 +1,5 @@
 """
-Maestro V2 - Tool System
+Maestro V3 - Tool System
 ========================
 Extensible tool system for agent capabilities.
 """

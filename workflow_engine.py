@@ -1,7 +1,7 @@
 """
 Workflow Engine
 ===============
-Advanced DAG-based workflow orchestration for Maestro V2.
+Advanced DAG-based workflow orchestration for Maestro V3.
 """
 
 import asyncio

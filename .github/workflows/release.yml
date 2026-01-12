@@ -22,17 +22,19 @@ jobs:
         draft: false
         prerelease: false
         body: |
-          ## Maestro V2 Release
+          ## Maestro V3 Release
           
           ### Features
           - Multi-agent AI orchestration with 8 specialized agents
           - Native desktop application (Windows, Linux)
           - Web version available
           - Screenshot/Vision tool for visual verification
+          - Integrated terminal for testing
+          - Hardware detection and model recommendations
           
           ### Downloads
-          - Windows: MaestroV2-Windows.exe
-          - Linux: MaestroV2-Linux
+          - Windows: MaestroV3-Windows.exe
+          - Linux: MaestroV3-Linux
           - Web Build: maestro-web.zip
           
           Created by HimaAzab - https://ibrahim-azab.com/
@@ -71,15 +73,15 @@ jobs:
     - name: Build Windows Executable
       shell: cmd
       run: |
-        pyinstaller --name=MaestroV2 --onefile --windowed --icon=icon.ico --add-data "frontend/dist;frontend/dist" --add-data "config.py;." --add-data "project_manager.py;." --add-data "memory_store.py;." --add-data "maestro.py;." --add-data "app.py;." --add-data "database.py;." --add-data "workflow_engine.py;." --add-data "settings_manager.py;." --add-data "agents;agents" --add-data "tools;tools" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.protocols.websockets.auto --hidden-import=uvicorn.lifespan.on --hidden-import=httpx --hidden-import=rich --hidden-import=sqlite3 --hidden-import=aiosqlite --hidden-import=fastapi --hidden-import=starlette --hidden-import=pydantic --hidden-import=webview --hidden-import=agents --hidden-import=agents.specialized --hidden-import=tools --hidden-import=tools.file_tool --hidden-import=tools.web_search_tool --hidden-import=tools.code_executor --hidden-import=tools.screenshot_tool --clean --noconfirm desktop_app.py
+        pyinstaller --name=MaestroV3 --onefile --windowed --icon=icon.ico --add-data "frontend/dist;frontend/dist" --add-data "config.py;." --add-data "project_manager.py;." --add-data "memory_store.py;." --add-data "maestro.py;." --add-data "app.py;." --add-data "database.py;." --add-data "workflow_engine.py;." --add-data "settings_manager.py;." --add-data "agents;agents" --add-data "tools;tools" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.protocols.websockets.auto --hidden-import=uvicorn.lifespan.on --hidden-import=httpx --hidden-import=rich --hidden-import=sqlite3 --hidden-import=aiosqlite --hidden-import=fastapi --hidden-import=starlette --hidden-import=pydantic --hidden-import=webview --hidden-import=agents --hidden-import=agents.specialized --hidden-import=tools --hidden-import=tools.file_tool --hidden-import=tools.web_search_tool --hidden-import=tools.code_executor --hidden-import=tools.screenshot_tool --clean --noconfirm desktop_app.py
 
     - name: Rename Windows Executable
-      run: mv dist/MaestroV2.exe dist/MaestroV2-Windows.exe
+      run: mv dist/MaestroV3.exe dist/MaestroV3-Windows.exe
 
     - name: Upload Windows Executable
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/MaestroV2-Windows.exe
+        files: dist/MaestroV3-Windows.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -114,12 +116,12 @@ jobs:
 
     - name: Build Linux Executable
       run: |
-        pyinstaller --name=MaestroV2-Linux --onefile --add-data "frontend/dist:frontend/dist" --add-data "config.py:." --add-data "project_manager.py:." --add-data "memory_store.py:." --add-data "maestro.py:." --add-data "database.py:." --add-data "workflow_engine.py:." --add-data "settings_manager.py:." --add-data "agents:agents" --add-data "tools:tools" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.protocols.websockets.auto --hidden-import=uvicorn.lifespan.on --hidden-import=httpx --hidden-import=rich --hidden-import=sqlite3 --hidden-import=aiosqlite --hidden-import=fastapi --hidden-import=starlette --hidden-import=pydantic --hidden-import=agents --hidden-import=agents.specialized --hidden-import=tools --hidden-import=tools.file_tool --hidden-import=tools.web_search_tool --hidden-import=tools.code_executor --hidden-import=tools.screenshot_tool --clean --noconfirm app.py
+        pyinstaller --name=MaestroV3-Linux --onefile --add-data "frontend/dist:frontend/dist" --add-data "config.py:." --add-data "project_manager.py:." --add-data "memory_store.py:." --add-data "maestro.py:." --add-data "database.py:." --add-data "workflow_engine.py:." --add-data "settings_manager.py:." --add-data "agents:agents" --add-data "tools:tools" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.protocols.websockets.auto --hidden-import=uvicorn.lifespan.on --hidden-import=httpx --hidden-import=rich --hidden-import=sqlite3 --hidden-import=aiosqlite --hidden-import=fastapi --hidden-import=starlette --hidden-import=pydantic --hidden-import=agents --hidden-import=agents.specialized --hidden-import=tools --hidden-import=tools.file_tool --hidden-import=tools.web_search_tool --hidden-import=tools.code_executor --hidden-import=tools.screenshot_tool --clean --noconfirm app.py
 
     - name: Upload Linux Executable
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/MaestroV2-Linux
+        files: dist/MaestroV3-Linux
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

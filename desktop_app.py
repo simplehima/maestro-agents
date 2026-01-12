@@ -1,7 +1,7 @@
 """
-Maestro V2 - Desktop Application Launcher
+Maestro V3 - Desktop Application Launcher
 ==========================================
-Creates a native Windows desktop window for Maestro V2.
+Creates a native Windows desktop window for Maestro V3.
 Uses pywebview to embed the web UI in a native window.
 """
 

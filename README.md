@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="frontend/public/favicon.ico" alt="Maestro V2 Logo" width="80" height="80">
+  <img src="frontend/public/favicon.ico" alt="Maestro V3 Logo" width="80" height="80">
 </p>
 
-<h1 align="center">Maestro V2</h1>
+<h1 align="center">Maestro V3</h1>
 
 <p align="center">
   <strong>🤖 Enterprise-Grade Multi-Agent AI Orchestration Platform</strong>
@@ -28,7 +28,7 @@
 
 ## 🌟 Overview
 
-**Maestro V2** is a sophisticated multi-agent AI orchestration system that coordinates specialized AI agents to accomplish complex tasks. It features a beautiful desktop application with real-time agent collaboration, persistent memory, and extensible tool system.
+**Maestro V3** is a sophisticated multi-agent AI orchestration system that coordinates specialized AI agents to accomplish complex tasks. It features a beautiful desktop application with real-time agent collaboration, persistent memory, and extensible tool system.
 
 Built with ❤️ by **HimaAzab**
 
@@ -102,7 +102,7 @@ python desktop_app.py
 python build.py
 ```
 
-This creates `MaestroV2.exe` in the `dist/` folder.
+This creates `MaestroV3.exe` in the `dist/` folder.
 
 ---
 
@@ -110,7 +110,7 @@ This creates `MaestroV2.exe` in the `dist/` folder.
 
 ### Starting a Project
 
-1. Launch Maestro V2 (desktop app or web)
+1. Launch Maestro V3 (desktop app or web)
 2. Enter your project objective (e.g., "Build a REST API for a todo app")
 3. Select a model preset (Basic, Standard, Advanced, or Cloud)
 4. Click **Start Orchestration**

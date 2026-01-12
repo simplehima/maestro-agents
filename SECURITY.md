@@ -10,7 +10,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of Maestro V2 seriously. If you discover a security vulnerability, please follow these steps:
+We take the security of Maestro V3 seriously. If you discover a security vulnerability, please follow these steps:
 
 ### 1. Do NOT Create a Public Issue
 
@@ -41,7 +41,7 @@ When reporting a vulnerability, please include:
 
 ## Security Best Practices
 
-When using Maestro V2, please follow these security best practices:
+When using Maestro V3, please follow these security best practices:
 
 ### API Keys
 
@@ -68,7 +68,7 @@ File tools are sandboxed to allowed directories only. Never add sensitive direct
 
 ## Security Features
 
-Maestro V2 includes these built-in security features:
+Maestro V3 includes these built-in security features:
 
 - ✅ Path sandboxing for file operations
 - ✅ Sandboxed code execution
@@ -82,4 +82,4 @@ We appreciate responsible disclosure and will acknowledge security researchers w
 
 ---
 
-Thank you for helping keep Maestro V2 secure!
+Thank you for helping keep Maestro V3 secure!

@@ -40,7 +40,7 @@ from config import (
 from project_manager import project_manager, Project
 from memory_store import MemoryStore
 
-app = FastAPI(title="Maestro V2", version="2.0.0")
+app = FastAPI(title="Maestro V3", version="3.1.0")
 
 app.add_middleware(
     CORSMiddleware,
